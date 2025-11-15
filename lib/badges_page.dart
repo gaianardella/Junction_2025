@@ -20,17 +20,17 @@ class _BadgesPageState extends State<BadgesPage>
 
   final List<Map<String, dynamic>> leaderboard = [
     {
-      'name': 'Samir',
+      'name': 'Gaia',
       'points': 7520,
       'me': true,
-      'avatar': 'assets/img_samir.png', // Use your uploaded Samir image
+      'avatar': 'assets/gaia.png', // Use your uploaded Samir image
       'streak': 12,
       'change': 2, // Position change (positive = moved up)
     },
     {
-      'name': 'Gaia',
+      'name': 'Samir',
       'points': 7210,
-      'avatar': 'assets/gaia.png', // Use your uploaded Gaia image
+      'avatar': 'assets/img_samir.png', // Use your uploaded Gaia image
       'streak': 8,
       'change': -1,
     },
