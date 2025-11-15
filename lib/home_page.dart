@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:fl_chart/fl_chart.dart';
 import 'widgets/avatar_widget.dart';
 import 'activity_page.dart';
 import 'ticket_page.dart';
-import 'community_page.dart';
+import 'goals_page.dart';
 import 'badges_page.dart';
 
 // Global variables (updated theme: blue and orange)
@@ -20,18 +19,24 @@ class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
 
   // Pages for the bottom tab navigator
-  final List<Widget> _pages = [
-    HomeContent(), // Separate class for home content
-    GoalsPage(),
-    ActivityPage(),
-    TicketsPage(),
-    BadgesPage(),
-  ];
+  late final List<Widget> _pages;
 
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _pages = [
+      HomeContent(onGoToGoals: () => _onItemTapped(1)), // Separate class for home content
+      GoalsPage(),
+      ActivityPage(),
+      TicketsPage(),
+      BadgesPage(),
+    ];
   }
 
   @override
@@ -58,7 +63,7 @@ class _HomePageState extends State<HomePage> {
             IconButton(
               icon: Icon(Icons.groups, color: Colors.white),
               onPressed: () => _onItemTapped(1),
-              tooltip: 'Community',
+              tooltip: 'Goals',
             ),
             IconButton(
               icon: Icon(Icons.military_tech, color: Colors.white),
@@ -82,42 +87,24 @@ class _HomePageState extends State<HomePage> {
 
 // Separate class for home content: expense monitor with donut chart
 class HomeContent extends StatefulWidget {
+  final VoidCallback? onGoToGoals;
+  HomeContent({this.onGoToGoals});
   @override
   _HomeContentState createState() => _HomeContentState();
 }
 
 class _HomeContentState extends State<HomeContent> {
-  // Demo data for expense categories
-  final List<Map<String, dynamic>> categories = [
-    {'name': 'Food', 'amount': 420.0, 'color': Color(0xFF42A5F5)}, // light blue
-    {
-      'name': 'Transport',
-      'amount': 180.0,
-      'color': Color(0xFFFFA000),
-    }, // orange
-    {'name': 'Home', 'amount': 950.0, 'color': Color(0xFF1976D2)}, // blue
-    {
-      'name': 'Shopping',
-      'amount': 260.0,
-      'color': Color(0xFFFF8F00),
-    }, // dark orange
-    {
-      'name': 'Leisure',
-      'amount': 140.0,
-      'color': Color(0xFF64B5F6),
-    }, // light blue
+  // Demo current balance
+  final double currentBalance = 12450.00;
+  // Small saving goals to show top-right with progress bars
+  final List<Map<String, dynamic>> savingGoals = [
+    {'title': 'Europe Trip', 'progress': 0.35},
+    {'title': 'New Bike', 'progress': 0.6},
+    {'title': 'Emergency Fund', 'progress': 0.15},
   ];
-
-  double get totalSpent =>
-      categories.fold(0.0, (sum, c) => sum + (c['amount'] as double));
-
-  String get totalSpentLabel {
-    final value = totalSpent;
-    if (value >= 1000) {
-      return '€${(value / 1000).toStringAsFixed(1)}k';
-    }
-    return '€${value.toStringAsFixed(0)}';
-  }
+  // Carousel controller
+  final PageController _carouselController = PageController(viewportFraction: 0.9);
+  int _carouselIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -152,7 +139,7 @@ class _HomeContentState extends State<HomeContent> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '${userName}\'s expenses',
+                        'Welcome, ${userName}',
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.w600,
@@ -160,33 +147,11 @@ class _HomeContentState extends State<HomeContent> {
                         ),
                       ),
                       SizedBox(height: 6),
-                      Row(
-                        children: [
-                          Text(
-                            'Monthly total',
-                            style: TextStyle(
-                              color: Colors.white.withOpacity(0.9),
-                            ),
-                          ),
-                          SizedBox(width: 8),
-                          Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: accentOrange,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Text(
-                              totalSpentLabel,
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ],
+                      Text(
+                        'Overview',
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.9),
+                        ),
                       ),
                     ],
                   ),
@@ -196,63 +161,13 @@ class _HomeContentState extends State<HomeContent> {
             ),
           ),
 
-          // Donut chart
+          // Saving goals (above balance)
           Padding(
-            padding: EdgeInsets.fromLTRB(16, 40, 16, 38),
-            child: SizedBox(
-              height: 200,
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  PieChart(
-                    PieChartData(
-                      sectionsSpace: 1,
-                      centerSpaceRadius: 55,
-                      startDegreeOffset: -90,
-                      sections:
-                          categories.map((c) {
-                            final double amount = c['amount'] as double;
-                            final double percent =
-                                totalSpent == 0
-                                    ? 0
-                                    : (amount / totalSpent) * 100;
-                            return PieChartSectionData(
-                              color: c['color'] as Color,
-                              value: amount,
-                              title: '',
-                              radius: 75,
-                              badgeWidget: null,
-                              showTitle: false,
-                            );
-                          }).toList(),
-                    ),
-                    swapAnimationDuration: Duration(milliseconds: 600),
-                    swapAnimationCurve: Curves.easeOutCubic,
-                  ),
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text('Total', style: TextStyle(color: Colors.grey[600])),
-                      SizedBox(height: 4),
-                      Text(
-                        totalSpentLabel,
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: primaryBlue,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          // Categories list (title removed)
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16),
-            child: Container(
+            padding: EdgeInsets.fromLTRB(16, 18, 16, 4),
+            child: GestureDetector(
+              onTap: () => widget.onGoToGoals?.call(),
+              child: Container(
+              width: double.infinity,
               decoration: BoxDecoration(
                 color: Colors.grey.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(24),
@@ -264,83 +179,336 @@ class _HomeContentState extends State<HomeContent> {
                   ),
                 ],
               ),
-              padding: EdgeInsets.fromLTRB(12, 0, 12, 12),
-              child: ListView.builder(
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                padding: EdgeInsets.only(top: 6),
-                itemCount: categories.length,
-                itemBuilder: (context, index) {
-                  final c = categories[index];
-                  final double amount = c['amount'] as double;
-                  final double percent =
-                      totalSpent == 0 ? 0 : (amount / totalSpent) * 100;
-                  return Card(
-                    color: Colors.grey.withOpacity(0.2),
-                    elevation: 0,
-                    margin: EdgeInsets.only(bottom: 8),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: ListTile(
-                      leading: Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: (c['color'] as Color).withOpacity(0.15),
-                          shape: BoxShape.circle,
+              padding: EdgeInsets.fromLTRB(16, 14, 16, 14),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: savingGoals.map((g) {
+                  return Padding(
+                    padding: EdgeInsets.only(bottom: 10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                g['title'] as String,
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            SizedBox(width: 8),
+                            Text(
+                              '${((g['progress'] as double) * 100).toStringAsFixed(0)}%',
+                              style: TextStyle(
+                                color: Colors.white70,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
                         ),
-                        child: Center(
-                          child: Container(
-                            width: 14,
-                            height: 14,
-                            decoration: BoxDecoration(
-                              color: c['color'] as Color,
-                              shape: BoxShape.circle,
-                            ),
+                        SizedBox(height: 6),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: LinearProgressIndicator(
+                            value: (g['progress'] as double),
+                            minHeight: 8,
+                            backgroundColor: Colors.white.withOpacity(0.25),
+                            valueColor: AlwaysStoppedAnimation<Color>(accentOrange),
                           ),
                         ),
-                      ),
-                      title: Text(
-                        c['name'] as String,
-                        style: TextStyle(fontWeight: FontWeight.w600),
-                      ),
-                      subtitle: LinearProgressIndicator(
-                        value: totalSpent == 0 ? 0 : amount / totalSpent,
-                        backgroundColor: Colors.grey[200],
-                        color: accentOrange,
-                        minHeight: 6,
-                      ),
-                      trailing: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text(
-                            '€${amount.toStringAsFixed(0)}',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: primaryBlue,
-                            ),
-                          ),
-                          SizedBox(height: 4),
-                          Text(
-                            '${percent.toStringAsFixed(0)}%',
-                            style: TextStyle(
-                              color: Colors.grey[600],
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
-                      ),
+                      ],
                     ),
                   );
-                },
+                }).toList(),
+              ),
+            ),
+            ),
+          ),
+
+          // Current Balance (no chart)
+          Padding(
+            padding: EdgeInsets.fromLTRB(16, 40, 16, 16),
+            child: Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Colors.grey.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(24),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.03),
+                    blurRadius: 20,
+                    offset: Offset(0, 10),
+                  ),
+                ],
+              ),
+              padding: EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    'Current Balance',
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 15,
+                    ),
+                  ),
+                  SizedBox(height: 6),
+                  Text(
+                    '€${currentBalance.toStringAsFixed(2)}',
+                    style: TextStyle(
+                      fontSize: 34,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      letterSpacing: 0.3,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          // Carousel with 2 sections
+          Padding(
+            padding: EdgeInsets.fromLTRB(16, 8, 16, 16),
+            child: SizedBox(
+              height: 170,
+              child: Stack(
+                children: [
+                  PageView(
+                    controller: _carouselController,
+                    onPageChanged: (i) => setState(() => _carouselIndex = i),
+                    children: [
+                      _buildTipCard(),
+                      _buildSuggestionCard(),
+                    ],
+                  ),
+                  Positioned(
+                    bottom: 8,
+                    left: 0,
+                    right: 0,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: List.generate(2, (i) {
+                        final bool active = i == _carouselIndex;
+                        return Container(
+                          width: active ? 20 : 8,
+                          height: 8,
+                          margin: EdgeInsets.symmetric(horizontal: 3),
+                          decoration: BoxDecoration(
+                            color: active ? accentOrange : Colors.white.withOpacity(0.4),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        );
+                      }),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
 
           SizedBox(height: 16),
         ],
+      ),
+    );
+  }
+
+  Widget _buildCarouselCard({
+    required String title,
+    required String subtitle,
+    required IconData icon,
+  }) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 4),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.grey.withOpacity(0.2),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.03),
+              blurRadius: 20,
+              offset: Offset(0, 10),
+            ),
+          ],
+        ),
+        padding: EdgeInsets.all(16),
+        child: Row(
+          children: [
+            Container(
+              padding: EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: accentOrange.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(icon, color: accentOrange, size: 28),
+            ),
+            SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 6),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 13,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTipCard() {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 4),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.grey.withOpacity(0.2),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.03),
+              blurRadius: 20,
+              offset: Offset(0, 10),
+            ),
+          ],
+        ),
+        padding: EdgeInsets.all(16),
+        child: Row(
+          children: [
+            Container(
+              padding: EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: accentOrange.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(Icons.restaurant_outlined, color: accentOrange, size: 28),
+            ),
+            SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Spending Tip',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 6),
+                  Text(
+                    "You spent too much at restaurants this month. You could improve your 'Europe Trip' goal.",
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 13,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSuggestionCard() {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 4),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.grey.withOpacity(0.2),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.03),
+              blurRadius: 20,
+              offset: Offset(0, 10),
+            ),
+          ],
+        ),
+        padding: EdgeInsets.all(16),
+        child: Row(
+          children: [
+            Container(
+              padding: EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: accentOrange.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(Icons.food_bank_outlined, color: accentOrange, size: 28),
+            ),
+            SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Suggestion',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 6),
+                  Text(
+                    'Try meal prep this week to cut costs and stay on track.',
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 13,
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: ElevatedButton(
+                      onPressed: () {},
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: accentOrange,
+                        foregroundColor: Colors.white,
+                        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: Text("Watch: Meal Prep 101"),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
