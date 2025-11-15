@@ -25,7 +25,7 @@ class TrainBookingPage extends StatelessWidget {
           color: Colors.white,
         ),
         actions: [
-          // Avatar in alto a destra
+          // Avatar at top right
           Padding(
             padding: EdgeInsets.only(right: 16),
             child: AvatarWidget(
@@ -95,7 +95,7 @@ class GymPage extends StatelessWidget {
           color: Colors.white,
         ),
         actions: [
-          // Avatar in alto a destra
+          // Avatar at top right
           Padding(
             padding: EdgeInsets.only(right: 16),
             child: AvatarWidget(
@@ -167,7 +167,7 @@ class MoviePage extends StatelessWidget {
           color: Colors.white,
         ),
         actions: [
-          // Avatar in alto a destra
+          // Avatar at top right
           Padding(
             padding: EdgeInsets.only(right: 16),
             child: AvatarWidget(
@@ -217,7 +217,7 @@ class MoviePage extends StatelessWidget {
   }
 }
 
-// ActivityPage con design migliorato, loghi aziendali e riferimenti visivi ai servizi
+// ActivityPage with improved design, brand logos, and service visuals
 class ActivityPage extends StatefulWidget {
   @override
   _ActivityPageState createState() => _ActivityPageState();
@@ -228,7 +228,7 @@ class _ActivityPageState extends State<ActivityPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         title: Text(
           'Virgin Experiences',
@@ -261,7 +261,7 @@ class _ActivityPageState extends State<ActivityPage> {
             children: [
               SizedBox(height: 16),
               
-              // Sezione Viaggi
+              // Travel section
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -306,7 +306,7 @@ class _ActivityPageState extends State<ActivityPage> {
               
               SizedBox(height: 32),
               
-              // Sezione Salute
+              // Health section
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -341,7 +341,7 @@ class _ActivityPageState extends State<ActivityPage> {
               
               SizedBox(height: 32),
               
-              // Sezione Intrattenimento
+              // Entertainment section
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -381,7 +381,7 @@ class _ActivityPageState extends State<ActivityPage> {
     );
   }
   
-  // Widget avanzato per creare card con logo aziendale e immagine di sfondo
+  // Advanced widget to create a card with company logo and background image
   Widget _buildEnhancedCard(
     BuildContext context, {
     required String logo,
@@ -401,7 +401,7 @@ class _ActivityPageState extends State<ActivityPage> {
       },
       child: Container(
         width: 165,
-        height: 240, // Aumentata l'altezza da 220 a 240 per risolvere l'overflow
+        height: 240, // Increased height from 220 to 240 to avoid overflow
         margin: EdgeInsets.symmetric(horizontal: 5),
         child: Card(
           elevation: 4,
@@ -412,14 +412,14 @@ class _ActivityPageState extends State<ActivityPage> {
             borderRadius: BorderRadius.circular(16),
             child: Stack(
               children: [
-                // Immagine di sfondo sfumata
+                // Blurred background image
                 Positioned.fill(
                   child: Image.asset(
                     backgroundImage,
                     fit: BoxFit.cover,
                   ),
                 ),
-                // Overlay gradient scuro
+                // Dark gradient overlay
                 Positioned.fill(
                   child: Container(
                     decoration: BoxDecoration(
@@ -434,13 +434,13 @@ class _ActivityPageState extends State<ActivityPage> {
                     ),
                   ),
                 ),
-                // Contenuto della card
+                // Card content
                 Padding(
                   padding: EdgeInsets.all(12),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Logo aziendale in alto
+                      // Company logo on top
                       Container(
                         width: 50,
                         height: 50,
@@ -457,7 +457,7 @@ class _ActivityPageState extends State<ActivityPage> {
                         ),
                       ),
                       Spacer(),
-                      // Icona relativa al servizio
+                      // Service-related icon
                       Container(
                         padding: EdgeInsets.all(8),
                         decoration: BoxDecoration(
@@ -471,11 +471,11 @@ class _ActivityPageState extends State<ActivityPage> {
                         ),
                       ),
                       SizedBox(height: 8),
-                      // Titolo e sottotitolo
+                      // Title and subtitle
                       Text(
                         title,
                         style: TextStyle(
-                          fontSize: 16, // Ridotta da 18 a 16
+                          fontSize: 16, // Reduced from 18 to 16
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
@@ -488,8 +488,8 @@ class _ActivityPageState extends State<ActivityPage> {
                           color: Colors.white.withOpacity(0.8),
                         ),
                       ),
-                      SizedBox(height: 4), // Ridotto da 8 a 4
-                      // Pulsante di azione
+                      SizedBox(height: 4), // Reduced from 8 to 4
+                      // Action button
                       Container(
                         width: double.infinity,
                         child: ElevatedButton(

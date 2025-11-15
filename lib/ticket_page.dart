@@ -914,7 +914,7 @@ class _TicketsPageState extends State<TicketsPage> with SingleTickerProviderStat
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      backgroundColor: Colors.transparent,
       // AppBar con titolo centrato
       appBar: AppBar(
         title: Text(
@@ -946,7 +946,7 @@ class _TicketsPageState extends State<TicketsPage> with SingleTickerProviderStat
         children: [
           // Stack dei ticket
           Container(
-            color: Colors.grey[100],
+            color: Colors.transparent,
             child: Column(
               children: [
                 Expanded(

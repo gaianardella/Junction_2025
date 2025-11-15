@@ -8,7 +8,7 @@ class AirplaneBookingPage extends StatefulWidget {
 
 
 class _AirplaneBookingPageState extends State<AirplaneBookingPage> {
-  // Helper per creare una card promozione 
+  // Helper to create a promotion card 
   Widget _buildPromoCard(String title, String description, IconData icon) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 8),
@@ -60,49 +60,49 @@ class _AirplaneBookingPageState extends State<AirplaneBookingPage> {
   }
   final Color virginRed = Color(0xFFE50914);
   
-  // Campi per la prenotazione
+  // Booking fields
   final _fromController = TextEditingController();
   final _toController = TextEditingController();
   final _dateController = TextEditingController();
   
-  // Dati simulati per i punti dell'utente
+  // Mocked user points
   final int userPoints = 7500;
   
-  // Dati simulati per le promozioni
+  // Mocked promotions data
   final List<Map<String, dynamic>> discounts = [
     {
       'points': 5000,
       'discount': '10%',
-      'description': 'Sconto del 10% sul prezzo del biglietto',
+      'description': '10% discount on ticket price',
       'isAvailable': true,
     },
     {
       'points': 7500,
       'discount': '15%',
-      'description': 'Sconto del 15% sul prezzo del biglietto',
+      'description': '15% discount on ticket price',
       'isAvailable': true,
     },
     {
       'points': 10000,
       'discount': '20%',
-      'description': 'Sconto del 20% sul prezzo del biglietto',
+      'description': '20% discount on ticket price',
       'isAvailable': false,
     },
     {
       'points': 20000,
       'discount': '30%',
-      'description': 'Sconto del 30% sul prezzo del biglietto + imbarco prioritario',
+      'description': '30% discount on ticket price + priority boarding',
       'isAvailable': false,
     },
     {
       'points': 50000,
       'discount': '50%',
-      'description': 'Sconto del 50% sul prezzo del biglietto + upgrade classe business',
+      'description': '50% discount on ticket price + business class upgrade',
       'isAvailable': false,
     },
   ];
   
-  // Dati simulati per i voli disponibili
+  // Mocked available flights
   final List<Map<String, dynamic>> flights = [
     {
       'from': 'Milan (MXP)',
@@ -152,7 +152,7 @@ class _AirplaneBookingPageState extends State<AirplaneBookingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         title: Text(
           'Flight Booking',
@@ -163,7 +163,7 @@ class _AirplaneBookingPageState extends State<AirplaneBookingPage> {
           ),
         ),
         actions: [
-          // Avatar in alto a destra
+          // Avatar at top right
           Padding(
             padding: EdgeInsets.only(right: 16),
             child: AvatarWidget(
@@ -180,7 +180,7 @@ class _AirplaneBookingPageState extends State<AirplaneBookingPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header con logo banner invece del testo
+            // Header with logo banner instead of text
             Container(
               width: double.infinity,
               padding: EdgeInsets.all(24),
@@ -190,9 +190,9 @@ class _AirplaneBookingPageState extends State<AirplaneBookingPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  // Logo Virgin Atlantic come immagine
+                  // Virgin Atlantic logo image
                   Image.asset(
-                    'assets/virgin_atlantic_logo.png', // Assicurati che questo file esista nel progetto
+                    'assets/virgin_atlantic_logo.png', // Ensure this file exists in the project
                     height: 80,
                     fit: BoxFit.contain,
                   ),
@@ -209,7 +209,7 @@ class _AirplaneBookingPageState extends State<AirplaneBookingPage> {
               ),
             ),
             
-            // Sezione di ricerca voli
+            // Flight search section
             Padding(
               padding: EdgeInsets.all(16),
               child: Card(
@@ -231,7 +231,7 @@ class _AirplaneBookingPageState extends State<AirplaneBookingPage> {
                         ),
                       ),
                       SizedBox(height: 16),
-                      // Da
+                      // From
                       TextField(
                         controller: _fromController,
                         decoration: InputDecoration(
@@ -241,7 +241,7 @@ class _AirplaneBookingPageState extends State<AirplaneBookingPage> {
                         ),
                       ),
                       SizedBox(height: 12),
-                      // A
+                      // To
                       TextField(
                         controller: _toController,
                         decoration: InputDecoration(
@@ -252,7 +252,7 @@ class _AirplaneBookingPageState extends State<AirplaneBookingPage> {
                         ),
                       ),
                       SizedBox(height: 12),
-                      // Data
+                      // Date
                       TextField(
                         controller: _dateController,
                         decoration: InputDecoration(
@@ -261,7 +261,7 @@ class _AirplaneBookingPageState extends State<AirplaneBookingPage> {
                           prefixIcon: Icon(Icons.calendar_today, color: virginRed),
                         ),
                         onTap: () async {
-                          // Mostra il date picker quando si tocca il campo
+                          // Show date picker when tapping the field
                           FocusScope.of(context).requestFocus(new FocusNode());
                           final DateTime? picked = await showDatePicker(
                             context: context,
@@ -289,15 +289,15 @@ class _AirplaneBookingPageState extends State<AirplaneBookingPage> {
                         },
                       ),
                       SizedBox(height: 20),
-                      // Pulsante di ricerca
+                      // Search button
                       Container(
                         width: double.infinity,
                         child: ElevatedButton.icon(
                           icon: Icon(Icons.search),
                           label: Text('Search Flights'),
                           onPressed: () {
-                            // Simula la ricerca di un volo e mostra la conferma
-                            Map<String, dynamic> sampleFlight = flights[0]; // Usa il primo volo come esempio
+                            // Simulate a flight search and show confirmation
+                            Map<String, dynamic> sampleFlight = flights[0]; // Use the first flight as an example
                             _showBookingConfirmationDialog(context, sampleFlight);
                           },
                           style: ElevatedButton.styleFrom(
@@ -371,7 +371,7 @@ class _AirplaneBookingPageState extends State<AirplaneBookingPage> {
     );
   }
   
-  // Helper per mostrare il nome del mese
+  // Helper to display month name
   String _getMonthName(int month) {
     const monthNames = [
       '', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
@@ -380,7 +380,7 @@ class _AirplaneBookingPageState extends State<AirplaneBookingPage> {
     return monthNames[month];
   }
   
-  // Mostra il dialogo di conferma prenotazione
+  // Show booking confirmation dialog
   void _showBookingConfirmationDialog(BuildContext context, Map<String, dynamic> flight) {
     showDialog(
       context: context,

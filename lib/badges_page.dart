@@ -43,7 +43,7 @@ class _BadgesPageState extends State<BadgesPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         title: Text(
           'Badges',
@@ -54,7 +54,7 @@ class _BadgesPageState extends State<BadgesPage> {
           ),
         ),
         actions: [
-          // Avatar in alto a destra
+          // Avatar at top right
           Padding(
             padding: EdgeInsets.only(right: 16),
             child: AvatarWidget(
