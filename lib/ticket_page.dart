@@ -201,7 +201,7 @@ class _ExpenseTrackerContentState extends State<ExpenseTrackerContent>
                         ),
                       ],
                     ),
-                    SizedBox(height: 16),
+                    SizedBox(height: 32),
                     _buildAnimatedChartWithBalance(),
                   ],
                 ),

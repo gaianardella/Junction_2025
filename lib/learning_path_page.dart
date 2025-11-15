@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'quiz_page.dart';
 
 class LearningPathPage extends StatefulWidget {
   @override
@@ -181,7 +182,21 @@ class _LearningPathPageState extends State<LearningPathPage> {
     final IconData icon =
         isLocked ? Icons.lock_outline : (isCurrent ? Icons.play_arrow_rounded : Icons.check);
 
-    return Container(
+    final bool launchQuiz =
+        !isLocked && title.toLowerCase().trim() == 'budgeting 101';
+
+    return InkWell(
+      onTap: launchQuiz
+          ? () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => QuizPage()),
+              );
+            }
+          : null,
+      borderRadius: BorderRadius.circular(14),
+      splashColor: edgeColor.withOpacity(0.15),
+      highlightColor: Colors.white10,
+      child: Container(
       margin: EdgeInsets.symmetric(vertical: 8),
       padding: EdgeInsets.all(14),
       decoration: BoxDecoration(
@@ -263,6 +278,7 @@ class _LearningPathPageState extends State<LearningPathPage> {
           if (isCurrent)
             Icon(Icons.arrow_forward_ios, color: Colors.white70, size: 16),
         ],
+      ),
       ),
     );
   }
