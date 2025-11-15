@@ -51,3 +51,6 @@ output.json
 # Optional: exclude asset previews if needed
 *.DS_Store
 *.log
+
+# Keep pubspec.lock tracked for apps
+!pubspec.lock
