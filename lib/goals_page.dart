@@ -134,7 +134,7 @@ class _GoalsPageState extends State<GoalsPage> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: primaryBlue,
+      backgroundColor: Color(0xFF0D1B2A),
       body: CustomScrollView(
         slivers: [
           // Modern App Bar
