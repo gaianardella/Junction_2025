@@ -33,6 +33,25 @@ class _SpendingSandboxPageState extends State<SpendingSandboxPage> {
   bool _incomeExpanded = true;
   bool _spendingExpanded = true;
   double? _computedBalance;
+  // Horizon options in months, with tick marks
+  final List<int> _horizonOptions = const [1, 2, 3, 6, 12, 24, 36, 48, 60];
+  int _horizonIndex = 0;
+  PageController? _horizonPageController;
+
+  @override
+  void initState() {
+    super.initState();
+    _horizonPageController = PageController(
+      initialPage: _horizonIndex,
+      viewportFraction: 0.25, // show ~4 items visible
+    );
+  }
+
+  @override
+  void dispose() {
+    _horizonPageController?.dispose();
+    super.dispose();
+  }
 
   final List<_SandboxGoal> _goals = [
     _SandboxGoal(
@@ -156,8 +175,105 @@ class _SpendingSandboxPageState extends State<SpendingSandboxPage> {
             ),
             SizedBox(height: 12),
 
+            // Projection horizon wheel (rotella)
             _slideIn(
               index: 4,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 6),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.timeline, color: Colors.white70, size: 18),
+                        SizedBox(width: 8),
+                        Text(
+                          'Projection horizon',
+                          style: TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w600),
+                        ),
+                        Spacer(),
+                        Container(
+                          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.06),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: Colors.white24),
+                          ),
+                          child: Text(
+                            _horizonLabel(_horizonOptions[_horizonIndex]),
+                            style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 8),
+                    SizedBox(
+                      height: 86,
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          // Base line
+                          Positioned.fill(
+                            child: Align(
+                              alignment: Alignment.center,
+                              child: Container(height: 2, color: Colors.white12),
+                            ),
+                          ),
+                          // Center pointer (like a gauge indicator)
+                          Positioned(
+                            top: 8,
+                            bottom: 8,
+                            child: Container(width: 2, color: accent),
+                          ),
+                          // Horizontal "wheel" via PageView with snapping
+                          PageView.builder(
+                            controller: _horizonPageController,
+                            physics: PageScrollPhysics(),
+                            onPageChanged: (i) {
+                              setState(() {
+                                _horizonIndex = i;
+                                if (_computedBalance != null) {
+                                  final monthlyNet = (salary + otherIncome) - totalExpenses;
+                                  _computedBalance = monthlyNet * _horizonOptions[_horizonIndex];
+                                }
+                              });
+                            },
+                            itemCount: _horizonOptions.length,
+                            itemBuilder: (context, i) {
+                              final bool isSelected = i == _horizonIndex;
+                              return Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    width: 2,
+                                    height: isSelected ? 24 : 16,
+                                    color: isSelected ? Colors.white : Colors.white30,
+                                  ),
+                                  SizedBox(height: 4),
+                                  AnimatedDefaultTextStyle(
+                                    duration: Duration(milliseconds: 150),
+                                    style: TextStyle(
+                                      color: isSelected ? Colors.white : Colors.white60,
+                                      fontSize: isSelected ? 13 : 11,
+                                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                                    ),
+                                    child: Text(_horizonLabel(_horizonOptions[i])),
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            SizedBox(height: 16),
+
+            _slideIn(
+              index: 5,
               child: Center(
                 child: GestureDetector(
                   onTap: () {
@@ -165,7 +281,7 @@ class _SpendingSandboxPageState extends State<SpendingSandboxPage> {
                     final double incomes = salary + otherIncome;
                     final double spend = totalExpenses;
                     setState(() {
-                      _computedBalance = incomes - spend;
+                      _computedBalance = (incomes - spend) * _horizonOptions[_horizonIndex];
                     });
                   },
                   child: Container(
@@ -376,7 +492,7 @@ class _SpendingSandboxPageState extends State<SpendingSandboxPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Final Balance', style: TextStyle(color: Colors.white70, fontSize: 12)),
+                Text('Final Balance (${_horizonLabel(_horizonOptions[_horizonIndex])})', style: TextStyle(color: Colors.white70, fontSize: 12)),
                 SizedBox(height: 4),
                 Text(
                   hasValue ? '€${value.toStringAsFixed(0)}' : '€0',
@@ -389,6 +505,14 @@ class _SpendingSandboxPageState extends State<SpendingSandboxPage> {
         ],
       ),
     );
+  }
+
+  String _horizonLabel(int months) {
+    if (months < 12) return '${months} mo';
+    final int years = months ~/ 12;
+    final int rem = months % 12;
+    if (rem == 0) return years == 1 ? '1 yr' : '${years} yrs';
+    return years == 1 ? '1 yr ${rem} mo' : '${years} yrs ${rem} mo';
   }
 
   Widget _collapsibleTile({

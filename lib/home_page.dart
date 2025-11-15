@@ -119,8 +119,7 @@ class _HomeContentState extends State<HomeContent> {
   double spendingLimit = 2500.00;
 
   bool _isLoadingInsights = false;
-  String _insightText =
-      'Your high food spending is impacting your goals. Check out the "Meal Prep 101" course to learn how to cut costs.';
+  String _insightText = '';
 
   List<Map<String, dynamic>> get savingGoals => [
     {
@@ -256,10 +255,10 @@ class _HomeContentState extends State<HomeContent> {
       slivers: [
         SliverAppBar(
           pinned: true,
-          expandedHeight: 200.0,
+          expandedHeight: 110.0,
           backgroundColor: Color(0xFF0D1B2A),
           flexibleSpace: FlexibleSpaceBar(
-            titlePadding: EdgeInsets.only(left: 24, bottom: 16),
+            titlePadding: EdgeInsets.only(left: 20, bottom: 12),
             centerTitle: false,
             title: Text(
               'Overview',
@@ -278,56 +277,29 @@ class _HomeContentState extends State<HomeContent> {
                 ),
               ),
               child: Padding(
-                padding: EdgeInsets.fromLTRB(24, 60, 24, 40),
+                padding: EdgeInsets.fromLTRB(20, 16, 20, 16),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Hello, ${userName}!',
-                          style: TextStyle(
-                            fontSize: 26,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.white,
-                          ),
-                        ),
-                        SizedBox(height: 6),
-                        GestureDetector(
-                          onTap: _simulateBalanceUpdate,
-                          child: Row(
-                            children: [
-                              Text(
-                                'Tap to Refresh Data',
-                                style: TextStyle(
-                                  color: Colors.white.withOpacity(0.8),
-                                  fontSize: 14,
-                                ),
-                              ),
-                              SizedBox(width: 4),
-                              Icon(
-                                Icons.refresh,
-                                color: Colors.white.withOpacity(0.8),
-                                size: 16,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
+                    Text(
+                      'Hello, ${userName}!',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
                     ),
-                    AvatarWidget(size: 50),
+                    Padding(
+                      padding: EdgeInsets.only(top: 6),
+                      child: AvatarWidget(size: 52),
+                    ),
                   ],
                 ),
               ),
             ),
           ),
-          actions: [
-            IconButton(
-              icon: Icon(Icons.settings, color: Colors.white),
-              onPressed: () {},
-            ),
-          ],
+          // actions removed
         ),
 
         // Middle Content
@@ -457,51 +429,9 @@ class _HomeContentState extends State<HomeContent> {
                     ),
                   ],
                 ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      'Monthly Spent',
-                      style: TextStyle(color: Colors.white70, fontSize: 14),
-                    ),
-                    SizedBox(height: 4),
-                    Text(
-                      '€${monthlySpending.toStringAsFixed(2)}',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: accentOrange,
-                      ),
-                    ),
-                  ],
-                ),
               ],
             ),
-            SizedBox(height: 16),
-            Row(
-              children: [
-                Icon(
-                  isOverBudget
-                      ? Icons.warning_amber_rounded
-                      : Icons.check_circle_outline,
-                  color: isOverBudget ? Colors.redAccent : Colors.greenAccent,
-                  size: 20,
-                ),
-                SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    isOverBudget
-                        ? 'Over budget! €${remaining.abs().toStringAsFixed(2)}'
-                        : '€${remaining.toStringAsFixed(2)} left to spend',
-                    style: TextStyle(
-                      color: isOverBudget ? Colors.redAccent : Colors.white,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-                Icon(Icons.arrow_forward_ios, color: Colors.white54, size: 14),
-              ],
-            ),
+            SizedBox(height: 8),
           ],
         ),
       ),
@@ -527,7 +457,6 @@ class _HomeContentState extends State<HomeContent> {
                     fontWeight: FontWeight.w700,
                   ),
                 ),
-                Icon(Icons.star_half, color: primaryBlue),
               ],
             ),
             SizedBox(height: 12),
@@ -721,12 +650,12 @@ class _HomeContentState extends State<HomeContent> {
               Container(
                 padding: EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: primaryBlue.withOpacity(0.15),
+                  color: accentOrange.withOpacity(0.15),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(
                   Icons.school_outlined,
-                  color: primaryBlue,
+                  color: accentOrange,
                   size: 24,
                 ),
               ),
