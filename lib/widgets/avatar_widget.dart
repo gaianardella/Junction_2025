@@ -9,7 +9,7 @@ class AvatarWidget extends StatelessWidget {
 
   const AvatarWidget({
     Key? key,
-    this.imagePath = 'assets/mostro2_profilo.png', // User Profile Photo
+    this.imagePath = 'assets/avatar_profile.png', // User Profile Photo
     this.size = 40,
   }) : super(key: key);
 

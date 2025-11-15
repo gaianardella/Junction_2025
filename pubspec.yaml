@@ -65,6 +65,7 @@ flutter_icons:
 flutter:
   assets:
     - assets/logo.png
+    - assets/avatar_profile.png
     - assets/badge_1.png
     - assets/badge_1_taken.png
     - assets/badge_2.png

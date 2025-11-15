@@ -1,980 +1,555 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'widgets/avatar_widget.dart';
+import 'package:fl_chart/fl_chart.dart';
+import 'widgets/avatar_widget.dart'; // keep this file in your project
 
-final Color virginRed = Color(0xFFE50914);
+// Theme & global colors
+final Color primaryBlue = Color(0xFF1E88E5);
+final Color accentOrange = Color(0xFF3A9C9F);
+final Color warningRed = Color(0xFFE53935);
+final Color successGreen = Color(0xFF43A047);
+final String userName = "Sarah";
 
-class TicketsPage extends StatefulWidget {
+// New main background color (Dark Blue)
+final Color mainDarkBlue = Color(0xFF0D1B2A);
+final Color expenseSectionBackground = Color(0xFF18181A);
+
+class TicketsPage extends StatelessWidget {
   @override
-  _TicketsPageState createState() => _TicketsPageState();
+  Widget build(BuildContext context) {
+    return ExpenseTrackerContent();
+  }
 }
 
-class _TicketsPageState extends State<TicketsPage> with SingleTickerProviderStateMixin {
-  late AnimationController _animationController;
-  int _selectedCardIndex = -1;
-  bool _isCardExpanded = false;
-  
-  // Definizione dei colori di sfondo per gli avatar con maggiore contrasto
-  final Map<String, Color> avatarBackgrounds = {
-    'assets/mostro2_profilo.png': Color(0xFF5DADE2), // Blu chiaro
-    'assets/mostro3_profilo.png': Color(0xFFF4D03F), // Giallo
-    'assets/mostro4_profilo.png': Color(0xFF58D68D), // Verde
-  };
-  
-  // Definizione dei biglietti (in stile iOS Wallet)
-  final List<Map<String, dynamic>> tickets = [
+class SpendingPrediction {
+  final String category;
+  final double currentSpending;
+  final double predictedNextMonth;
+  final double trend;
+  final String insight;
+  final bool isWarning;
+
+  SpendingPrediction({
+    required this.category,
+    required this.currentSpending,
+    required this.predictedNextMonth,
+    required this.trend,
+    required this.insight,
+    required this.isWarning,
+  });
+}
+
+class ExpenseTrackerContent extends StatefulWidget {
+  @override
+  _ExpenseTrackerContentState createState() => _ExpenseTrackerContentState();
+}
+
+class _ExpenseTrackerContentState extends State<ExpenseTrackerContent>
+    with TickerProviderStateMixin {
+  // Chart/pulse controllers
+  late AnimationController _chartAnimationController;
+  late AnimationController _pulseController;
+  late Animation<double> _chartAnimation;
+
+  // Dynamic account balance (you can update this variable programmatically)
+  double accountBalance = 14095.0; // default value (dynamic variable)
+
+  // Demo categories
+  List<Map<String, dynamic>> categories = [
     {
-      'type': 'travel',
-      'title': 'Departure and Destination',
-      'from': 'MXP',
-      'to': 'LHR',
-      'date': '15 APR',
-      'time': '10:00',
-      'flightNumber': 'VS206',
-      'gate': '14',
-      'seat': '12A',
-      'backgroundColor': virginRed,
-      'textColor': Colors.white,
-      'logoPath': 'assets/virgin_atlantic_logo.png',
-      'company': 'Virgin Atlantic',
-      'fromCity': 'Milan',
-      'toCity': 'London'
+      'name': 'Subscriptions',
+      'amount': 950.0,
+      'color': Color(0xFFE53935),
+      'lastMonth': 600.0,
+      'icon': Icons.warning_amber_rounded,
+      'isAlert': true,
     },
     {
-      'type': 'membership',
-      'title': 'Gym Access',
-      'membershipNumber': '9876543210',
-      'validUntil': '15 MAY 2025',
-      'backgroundColor': virginRed,
-      'textColor': Colors.white,
-      'logoPath': 'assets/virgin_active_logo.png',
-      'company': 'Virgin Active',
-      'membershipType': 'Premium Subscription',
-      'memberName': 'Sarah Rossi',
-      'memberLevel': 'VIP'
+      'name': 'Food',
+      'amount': 420.0,
+      'color': Color(0xFF42A5F5),
+      'lastMonth': 380.0,
+      'icon': Icons.restaurant,
     },
     {
-      'type': 'event',
-      'title': 'Live Concert',
-      'eventName': 'Virgin Radio Live Festival',
-      'date': '22 JUN',
-      'time': '19:30',
-      'location': 'San Siro Stadium, Milan',
-      'seat': 'Section B, Row 10, Seat 45',
-      'backgroundColor': virginRed,
-      'textColor': Colors.white,
-      'logoPath': 'assets/virgin_radio_logo.png',
-      'company': 'Virgin Radio'
+      'name': 'Transport',
+      'amount': 180.0,
+      'color': Color(0xFFFFA000),
+      'lastMonth': 150.0,
+      'icon': Icons.directions_car,
+    },
+    {
+      'name': 'Shopping',
+      'amount': 260.0,
+      'color': Color(0xFFFF8F00),
+      'lastMonth': 280.0,
+      'icon': Icons.shopping_bag,
+    },
+    {
+      'name': 'Leisure',
+      'amount': 140.0,
+      'color': Color(0xFF64B5F6),
+      'lastMonth': 160.0,
+      'icon': Icons.sports_esports,
     },
   ];
 
-  // Animazione del ticket che si espande
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(
-      duration: Duration(milliseconds: 300),
+
+    // Ensure alert categories are at the top
+    _sortCategories();
+
+    // Chart animation
+    _chartAnimationController = AnimationController(
       vsync: this,
+      duration: Duration(milliseconds: 1400),
     );
+    _chartAnimation = CurvedAnimation(
+      parent: _chartAnimationController,
+      curve: Curves.easeOutCubic,
+    );
+
+    // Pulse for alert icons
+    _pulseController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 2000),
+    )..repeat(reverse: true);
+
+    // start chart
+    _chartAnimationController.forward();
+  }
+
+  void _sortCategories() {
+    categories.sort((a, b) {
+      bool aIsAlert = a['isAlert'] == true;
+      bool bIsAlert = b['isAlert'] == true;
+      if (aIsAlert && !bIsAlert) return -1;
+      if (!aIsAlert && bIsAlert) return 1;
+      return 0;
+    });
   }
 
   @override
   void dispose() {
-    _animationController.dispose();
+    _chartAnimationController.dispose();
+    _pulseController.dispose();
     super.dispose();
   }
 
-  void _toggleCardExpansion(int index) {
-    setState(() {
-      if (_selectedCardIndex == index && _isCardExpanded) {
-        // Close the ticket
-        _isCardExpanded = false;
-        _animationController.reverse();
-      } else {
-        // Open the ticket
-        _selectedCardIndex = index;
-        _isCardExpanded = true;
-        _animationController.forward(from: 0.0);
-      }
-    });
+  double get totalSpent =>
+      categories.fold(0.0, (sum, c) => sum + (c['amount'] as double));
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: mainDarkBlue,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header (greeting + avatar)
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Hello, $userName',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          'Overview',
+                          style: TextStyle(color: Colors.white70, fontSize: 13),
+                        ),
+                      ],
+                    ),
+                    AvatarWidget(size: 44),
+                  ],
+                ),
+              ),
+
+              SizedBox(height: 18),
+
+              // Chart + center balance
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.pie_chart, color: primaryBlue, size: 22),
+                        SizedBox(width: 8),
+                        Text(
+                          'Spending Breakdown',
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 32),
+                    _buildAnimatedChartWithBalance(),
+                  ],
+                ),
+              ),
+
+              // --- CHANGE: Increased spacing here to push the chart up ---
+              SizedBox(height: 36),
+
+              // Expense list section (starts with a different background color)
+              Container(
+                color: expenseSectionBackground,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 14),
+                      child: Column(
+                        children: List.generate(categories.length, (index) {
+                          final c = categories[index];
+                          final double amount = c['amount'] as double;
+                          final double lastMonth = c['lastMonth'] as double;
+                          final double change = amount - lastMonth;
+                          final bool isAlert = c['isAlert'] == true;
+                          final double percent =
+                              totalSpent == 0 ? 0 : (amount / totalSpent) * 100;
+
+                          return _buildGlassExpenseItem(
+                            name: c['name'] as String,
+                            iconData: c['icon'] as IconData,
+                            color: c['color'] as Color,
+                            amount: amount,
+                            percent: percent,
+                            isAlert: isAlert,
+                            change: change,
+                          );
+                        }),
+                      ),
+                    ),
+                    SizedBox(height: 80),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
-  void _showAddFriendsDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Add Friends'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  decoration: InputDecoration(
-                    labelText: 'Search friends',
-                    prefixIcon: Icon(Icons.search),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0),
+  // Animated pie chart with center balance (uses TweenAnimationBuilder for count-up)
+  Widget _buildAnimatedChartWithBalance() {
+    // Safe fallback
+    final total = totalSpent > 0 ? totalSpent : 1.0;
+
+    return AnimatedBuilder(
+      animation: _chartAnimation,
+      builder: (context, child) {
+        // center account balance animation - scale/tint synced with chart animation
+        return SizedBox(
+          height: 260,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              // Animated pie: scale + fade + pop radius
+              Transform.scale(
+                scale: 0.92 + (_chartAnimation.value * 0.14),
+                child: Opacity(
+                  opacity: _chartAnimation.value,
+                  child: PieChart(
+                    PieChartData(
+                      sectionsSpace: 2,
+                      centerSpaceRadius: 74,
+                      startDegreeOffset: -90,
+                      sections:
+                          categories.map((c) {
+                            final double amount = c['amount'] as double;
+                            final animatedValue =
+                                amount * _chartAnimation.value;
+                            return PieChartSectionData(
+                              color: c['color'] as Color,
+                              value: animatedValue,
+                              radius:
+                                  58 +
+                                  (_chartAnimation.value * 16), // pop animation
+                              title: '',
+                              showTitle: false,
+                            );
+                          }).toList(),
                     ),
+                    swapAnimationDuration: Duration(milliseconds: 600),
+                    swapAnimationCurve: Curves.easeOutCubic,
                   ),
                 ),
-                SizedBox(height: 15),
-                _buildFriendItem('Luca Verdi', 'assets/mostro2_profilo.png'),
-                _buildFriendItem('Sofia Russo', 'assets/mostro3_profilo.png'),
-                _buildFriendItem('Marco Bruno', 'assets/mostro4_profilo.png'),
-              ],
-            ),
+              ),
+
+              // Center glass circle with animated account balance
+              Container(
+                width: 150,
+                height: 150,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.12),
+                      blurRadius: 14,
+                      offset: Offset(0, 6),
+                    ),
+                  ],
+                ),
+                child: TweenAnimationBuilder<double>(
+                  tween: Tween(begin: 0.0, end: accountBalance),
+                  duration: Duration(milliseconds: 900),
+                  curve: Curves.easeOutCubic,
+                  builder: (context, value, child) {
+                    return Transform.scale(
+                      scale: 0.95 + (_chartAnimation.value * 0.12),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            '€${value >= 1000 ? (value / 1000).toStringAsFixed(1) + 'k' : value.toStringAsFixed(0)}',
+                            style: TextStyle(
+                              fontSize: 26,
+                              color: primaryBlue,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(height: 6),
+                          Text(
+                            'Total Balance',
+                            style: TextStyle(
+                              color: Colors.grey[700],
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                // Implement the logic to add selected friends
-                Navigator.of(context).pop();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Friends invited successfully!'),
-                    backgroundColor: virginRed,
-                  ),
-                );
-              },
-              child: Text('Invite', style: TextStyle(color: virginRed)),
-            ),
-          ],
         );
       },
     );
   }
 
-  Widget _buildFriendItem(String name, String imagePath) {
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        children: [
-          CircleAvatar(
-            radius: 24,
-            backgroundImage: AssetImage(imagePath),
-            backgroundColor: avatarBackgrounds[imagePath], // Usa il colore dalla mappa
-          ),
-          SizedBox(width: 15),
-          Text(
-            name,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          Spacer(),
-          Checkbox(
-            value: false,
-            onChanged: (value) {},
-            activeColor: virginRed,
-          ),
-        ],
-      ),
-    );
-  }
-  
-  Widget _buildFriendAvatar(String imagePath, Color color) {
-    return Container(
-      width: 38,
-      height: 38,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: avatarBackgrounds[imagePath] ?? Colors.white,
-        border: Border.all(color: Colors.white, width: 2),
-      ),
-      child: CircleAvatar(
-        backgroundImage: AssetImage(imagePath),
-        backgroundColor: color,
-      ),
-    );
-  }
+  // Glassmorphic expense item
+  Widget _buildGlassExpenseItem({
+    required String name,
+    required IconData iconData,
+    required Color color,
+    required double amount,
+    required double percent,
+    required bool isAlert,
+    required double change,
+  }) {
+    // Right-side amount text style
+    final amountText =
+        (amount >= 0 ? '+€' : '-€') + amount.abs().toStringAsFixed(2);
+    final amountColor = amount >= 0 ? successGreen : warningRed;
 
-  Widget _buildCard(int index, Map<String, dynamic> ticket) {
-    final bool isSelected = _selectedCardIndex == index;
-    
-    // Calcolo iniziale della posizione di default delle carte quando sono tutte chiuse
-    // Ogni carta è posizionata più in basso rispetto alla precedente
-    double initialTopPosition = 20.0 + (index * 80.0);
-    
-    // Se una carta è selezionata, riposiziona le altre
-    double topMargin;
-    if (_isCardExpanded) {
-      if (isSelected) {
-        // La carta selezionata va in alto
-        topMargin = 20.0;
-      } else if (index < _selectedCardIndex) {
-        // Le carte sopra quella selezionata si spostano più in alto
-        topMargin = 10.0;
-      } else {
-        // Le carte sotto quella selezionata vanno in fondo
-        topMargin = 500.0;
-      }
-    } else {
-      // Quando tutte le carte sono chiuse, mantieni la posizione a cascata
-      topMargin = initialTopPosition;
-    }
-    
-    final double opacity = isSelected ? 1.0 : (_isCardExpanded ? 0.7 : 1.0);
-    
-    // Ulteriormente aumentata l'altezza del biglietto espanso 
-    final double cardHeight;
-    if (isSelected && _isCardExpanded) {
-      // Altezza specifica in base al tipo di biglietto
-      if (ticket['type'] == 'event') {
-        cardHeight = 500; // Più alta per Virgin Radio
-      } else {
-        cardHeight = 480; // Per gli altri tipi
-      }
-    } else {
-      cardHeight = 200; // Altezza standard quando chiuso
-    }
-    
-    return AnimatedPositioned(
-      duration: Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-      top: topMargin,
-      left: 16,
-      right: 16,
-      child: GestureDetector(
-        onTap: () => _toggleCardExpansion(index),
-        child: AnimatedOpacity(
-          duration: Duration(milliseconds: 300),
-          opacity: opacity,
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(18),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
           child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Colors.white.withOpacity(0.02),
+                  Colors.white.withOpacity(0.01),
+                ],
+              ),
+              color: Colors.white.withOpacity(0.03),
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: Colors.white.withOpacity(0.06)),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
-                  blurRadius: 8,
-                  offset: Offset(0, 4),
+                  color: Colors.black.withOpacity(0.45),
+                  blurRadius: 18,
+                  offset: Offset(0, 8),
                 ),
               ],
             ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(16),
-              child: AnimatedContainer(
-                duration: Duration(milliseconds: 300),
-                height: cardHeight,
-                decoration: BoxDecoration(
-                  color: ticket['backgroundColor'],
-                ),
-                child: Stack(
-                  children: [
-                    _buildCardContent(ticket, isSelected && _isCardExpanded),
-                    
-                    // Bottone "Add Friends" in basso a destra
-                    if (isSelected && _isCardExpanded)
-                      Positioned(
-                        right: 20,
-                        bottom: 20,
-                        child: FloatingActionButton.small(
-                          heroTag: "addFriend_$index",
-                          onPressed: _showAddFriendsDialog,
-                          backgroundColor: ticket['backgroundColor'],
-                          child: Icon(
-                            Icons.person_add_alt_1,
-                            color: Colors.white,
-                            size: 20,
-                          ),
-                          tooltip: 'Add Friends',
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCardContent(Map<String, dynamic> ticket, bool isExpanded) {
-    switch (ticket['type']) {
-      case 'travel':
-        return _buildTravelTicket(ticket, isExpanded);
-      case 'membership':
-        return _buildMembershipCard(ticket, isExpanded);
-      case 'event':
-        return _buildEventTicket(ticket, isExpanded);
-      default:
-        return Container();
-    }
-  }
-
-  Widget _buildTravelTicket(Map<String, dynamic> ticket, bool isExpanded) {
-    return Column(
-      children: [
-        Padding(
-          padding: EdgeInsets.all(20.0),
-          child: Row(
-            children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                ),
-                child: Center(
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(24),
-                    child: Image.asset(
-                      ticket['logoPath'],
-                      width: 36,
-                      height: 36,
-                      fit: BoxFit.cover,
+            child: Row(
+              children: [
+                // Icon circle with neon accent
+                Container(
+                  width: 56,
+                  height: 56,
+                  decoration: BoxDecoration(
+                    gradient: RadialGradient(
+                      center: Alignment(-0.6, -0.6),
+                      radius: 1.2,
+                      colors: [color.withOpacity(0.22), Colors.transparent],
                     ),
+                    color: Colors.white.withOpacity(0.03),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.white.withOpacity(0.03)),
                   ),
-                ),
-              ),
-              SizedBox(width: 15),
-              Text(
-                ticket['company'],
-                style: TextStyle(
-                  color: ticket['textColor'],
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              Spacer(),
-              // Avatar degli amici che partecipano al viaggio (solo per il biglietto aereo)
-              if (ticket['type'] == 'travel')
-                Row(
-                  children: [
-                    _buildFriendAvatar('assets/mostro4_profilo.png',Colors.yellow),
-                    Transform.translate(
-                      offset: Offset(-10, 0),
-                      child: _buildFriendAvatar('assets/mostro2_profilo.png',Colors.pink),
-                    ),
-                  ],
-                ),
-            ],
-          ),
-        ),
-        Expanded(
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(16),
-                bottomRight: Radius.circular(16),
-              ),
-            ),
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: EdgeInsets.all(20.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              ticket['from'],
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Text(
-                              ticket['fromCity'],
-                              style: TextStyle(
-                                color: Colors.grey[700],
-                                fontSize: 14,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Icon(Icons.flight, color: ticket['backgroundColor']),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text(
-                              ticket['to'],
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Text(
-                              ticket['toCity'],
-                              style: TextStyle(
-                                color: Colors.grey[700],
-                                fontSize: 14,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    if (isExpanded) ...[
-                      SizedBox(height: 20),
-                      Divider(color: Colors.grey[300]),
-                      SizedBox(height: 10),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          _buildInfoColumn('Date', ticket['date']),
-                          _buildInfoColumn('Time', ticket['time']),
-                          _buildInfoColumn('Flight', ticket['flightNumber']),
-                        ],
-                      ),
-                      SizedBox(height: 20),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          _buildInfoColumn('Gate', ticket['gate']),
-                          _buildInfoColumn('Seat', ticket['seat']),
-                          _buildInfoColumn('Class', 'Economy'),
-                        ],
-                      ),
-                      SizedBox(height: 30),
-                      Center(
-                        child: Container(
-                          height: 100,
-                          width: 100,
-                          decoration: BoxDecoration(
-                            color: Colors.grey[200],
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Icon(
-                            Icons.qr_code_2,
-                            size: 80,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 40), // Extra padding for the floating button
-                    ],
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildMembershipCard(Map<String, dynamic> ticket, bool isExpanded) {
-    return Column(
-      children: [
-        Padding(
-          padding: EdgeInsets.all(20.0),
-          child: Row(
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                ),
-                child: Center(
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
-                    child: Image.asset(
-                      ticket['logoPath'],
-                      width: 30,
-                      height: 30,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(width: 15),
-              Text(
-                ticket['company'],
-                style: TextStyle(
-                  color: ticket['textColor'],
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              Spacer(),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  ticket['memberLevel'],
-                  style: TextStyle(
-                    color: ticket['backgroundColor'],
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        Expanded(
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(16),
-                bottomRight: Radius.circular(16),
-              ),
-            ),
-            child: isExpanded 
-              ? Column(
-                  children: [
-                    // Info section
-                    Padding(
-                      padding: EdgeInsets.all(15.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            ticket['memberName'],
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(height: 5),
-                          Text(
-                            ticket['membershipType'],
-                            style: TextStyle(
-                              color: ticket['backgroundColor'],
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          SizedBox(height: 12),
-                          Row(
-                            children: [
-                              Icon(Icons.credit_card, size: 16, color: Colors.grey[600]),
-                              SizedBox(width: 5),
-                              Text(
-                                'Card Number: ${ticket["membershipNumber"]}',
-                                style: TextStyle(
-                                  color: Colors.grey[700],
-                                  fontSize: 15,
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 6),
-                          Row(
-                            children: [
-                              Icon(Icons.calendar_today, size: 16, color: Colors.grey[600]),
-                              SizedBox(width: 5),
-                              Text(
-                                'Valid until: ${ticket["validUntil"]}',
-                                style: TextStyle(
-                                  color: Colors.grey[700],
-                                  fontSize: 15,
-                                ),
-                              ),
-                            ],
+                  child: Center(
+                    child: Container(
+                      width: 38,
+                      height: 38,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: color.withOpacity(0.14),
+                        boxShadow: [
+                          BoxShadow(
+                            color: color.withOpacity(0.12),
+                            blurRadius: 8,
+                            offset: Offset(0, 4),
                           ),
                         ],
                       ),
+                      child: Icon(iconData, color: color, size: 20),
                     ),
-                    // QR Code section
-                    Expanded(
-                      child: Center(
-                        child: Container(
-                          padding: EdgeInsets.only(bottom: 0),
-                          height: 100,
-                          width: 100,
-                          decoration: BoxDecoration(
-                            color: Colors.grey[200],
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Icon(
-                            Icons.qr_code_2,
-                            size: 80,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ),
-                    ),
-                    // Button section
-                    Container(
-                      padding: EdgeInsets.only(bottom: 20, left: 20, right: 20),
-                      child: ElevatedButton.icon(
-                        icon: Icon(Icons.event_available),
-                        label: Text('Book a Class'),
-                        onPressed: () {},
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: ticket['backgroundColor'],
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 20), // Extra padding for the floating button
-                  ],
-                )
-              : Padding(
-                  padding: EdgeInsets.all(20.0),
+                  ),
+                ),
+
+                SizedBox(width: 12),
+
+                // Name & subtitle
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        ticket['memberName'],
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(height: 5),
-                      Text(
-                        ticket['membershipType'],
-                        style: TextStyle(
-                          color: ticket['backgroundColor'],
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      SizedBox(height: 15),
                       Row(
                         children: [
-                          Icon(Icons.credit_card, size: 16, color: Colors.grey[600]),
-                          SizedBox(width: 5),
-                          Text(
-                            'Card Number: ${ticket["membershipNumber"]}',
-                            style: TextStyle(
-                              color: Colors.grey[700],
-                              fontSize: 16,
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 8),
-                      Row(
-                        children: [
-                          Icon(Icons.calendar_today, size: 16, color: Colors.grey[600]),
-                          SizedBox(width: 5),
-                          Text(
-                            'Valid until: ${ticket["validUntil"]}',
-                            style: TextStyle(
-                              color: Colors.grey[700],
-                              fontSize: 16,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildEventTicket(Map<String, dynamic> ticket, bool isExpanded) {
-    return Column(
-      children: [
-        // Header section
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 15.0),
-          child: Row(
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                ),
-                child: Center(
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
-                    child: Image.asset(
-                      ticket['logoPath'],
-                      width: 30,
-                      height: 30,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(width: 15),
-              Text(
-                ticket['company'],
-                style: TextStyle(
-                  color: ticket['textColor'],
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              Spacer(),
-              // Avatar degli amici che partecipano all'evento
-              _buildFriendAvatar('assets/mostro3_profilo.png',Colors.lightBlue),
-            ],
-          ),
-        ),
-        // Main content
-        Expanded(
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(16),
-                bottomRight: Radius.circular(16),
-              ),
-            ),
-            child: !isExpanded
-              // Contenuto quando la tessera è CHIUSA
-              ? Container(
-                  padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 15.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        ticket['eventName'],
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(height: 8),
-                      Row(
-                        children: [
-                          Icon(Icons.calendar_today, size: 14, color: Colors.grey[600]),
-                          SizedBox(width: 5),
-                          Text(
-                            '${ticket["date"]} - ${ticket["time"]}',
-                            style: TextStyle(
-                              color: Colors.grey[700],
-                              fontSize: 14,
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 5),
-                      Row(
-                        children: [
-                          Icon(Icons.location_on, size: 14, color: Colors.grey[600]),
-                          SizedBox(width: 5),
                           Flexible(
                             child: Text(
-                              ticket['location'],
+                              name,
                               style: TextStyle(
-                                color: Colors.grey[700],
-                                fontSize: 14,
+                                color: Colors.white,
+                                fontSize: 15,
+                                fontWeight: FontWeight.w700,
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
+                          if (isAlert) ...[
+                            SizedBox(width: 8),
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: warningRed,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                'ALERT',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                      SizedBox(height: 6),
+                      Row(
+                        children: [
+                          Icon(
+                            change >= 0
+                                ? Icons.arrow_upward
+                                : Icons.arrow_downward,
+                            size: 12,
+                            color: change >= 0 ? warningRed : successGreen,
+                          ),
+                          SizedBox(width: 6),
+                          Text(
+                            '${change >= 0 ? '+' : ''}€${change.toStringAsFixed(0)} vs last month',
+                            style: TextStyle(
+                              color: Colors.white70,
+                              fontSize: 12,
+                            ),
+                          ),
                         ],
                       ),
                     ],
                   ),
-                )
-              // Contenuto quando la tessera è APERTA
-              : SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      // Info section
-                      Container(
-                        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              ticket['eventName'],
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            SizedBox(height: 10),
-                            Row(
-                              children: [
-                                Icon(Icons.calendar_today, size: 16, color: Colors.grey[600]),
-                                SizedBox(width: 5),
-                                Text(
-                                  '${ticket["date"]} - ${ticket["time"]}',
-                                  style: TextStyle(
-                                    color: Colors.grey[700],
-                                    fontSize: 15,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 5),
-                            Row(
-                              children: [
-                                Icon(Icons.location_on, size: 16, color: Colors.grey[600]),
-                                SizedBox(width: 5),
-                                Text(
-                                  ticket['location'],
-                                  style: TextStyle(
-                                    color: Colors.grey[700],
-                                    fontSize: 15,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      Divider(color: Colors.grey[300]),
-                      // Seat details
-                      Container(
-                        width: double.infinity,
-                        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'SEAT DETAILS',
-                              style: TextStyle(
-                                color: Colors.grey[600],
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            SizedBox(height: 5),
-                            Text(
-                              ticket['seat'],
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      // QR code con margini sufficienti
-                      Container(
-                        margin: EdgeInsets.only(top: 40, bottom: 60), // Extra bottom margin for FAB
-                        height: 120,
-                        width: 120,
-                        decoration: BoxDecoration(
-                          color: Colors.grey[200],
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Icon(
-                          Icons.qr_code_2,
-                          size: 90,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ],
-                  ),
                 ),
-          ),
-        ),
-      ],
-    );
-  }
 
-  Widget _buildInfoColumn(String title, String value) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          title,
-          style: TextStyle(
-            color: Colors.grey[600],
-            fontSize: 12,
-          ),
-        ),
-        SizedBox(height: 4),
-        Text(
-          value,
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ],
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      // AppBar con titolo centrato
-      appBar: AppBar(
-        title: Text(
-          'Your Tickets',
-          style: TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.w500,
-            color: Colors.white,
-          ),
-        ),
-        actions: [
-          // Avatar in alto a destra
-          Padding(
-            padding: EdgeInsets.only(right: 16),
-            child: AvatarWidget(
-            ),
-          ),
-        ],
-        backgroundColor: virginRed,
-        elevation: 2,
-        centerTitle: true, // Imposta il titolo al centro
-        iconTheme: IconThemeData(
-          color: Colors.white,
-        ),
-        automaticallyImplyLeading: true,
-      ),
-      // Il corpo dell'app con lo stack dei biglietti
-      body: Stack(
-        children: [
-          // Stack dei ticket
-          Container(
-            color: Colors.transparent,
-            child: Column(
-              children: [
-                Expanded(
-                  child: Stack(
-                    alignment: Alignment.topCenter,
-                    clipBehavior: Clip.none,
-                    children: List.generate(tickets.length, (index) {
-                      return _buildCard(index, tickets[index]);
-                    }),
-                  ),
+                // Right column: amount + percent
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      amountText,
+                      style: TextStyle(
+                        color: amount >= 0 ? successGreen : warningRed,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 15,
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      '${percent.toStringAsFixed(0)}%',
+                      style: TextStyle(color: Colors.white54, fontSize: 12),
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
-          
-          // Pulsante + sul lato destro
-          Positioned(
-            right: 20,
-            bottom: 20, // Posizionato appena sopra la navbar
-            child: FloatingActionButton(
-              onPressed: () {},
-              backgroundColor: virginRed,
-              child: Icon(Icons.add, color: Colors.white),
-              heroTag: "addTicket", // Per evitare conflitti con altri FAB
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
+}
+
+// Background painter — subtle pattern for the header region (kept for aesthetics)
+class BackgroundPatternPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint =
+        Paint()
+          ..color = Colors.white.withOpacity(0.02)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1;
+
+    for (int i = 0; i < 4; i++) {
+      double radius = (i + 1) * 36.0;
+      canvas.drawCircle(Offset(size.width * 0.9, -10), radius, paint);
+    }
+
+    for (int i = 0; i < 6; i++) {
+      double x = i * 60.0;
+      canvas.drawLine(
+        Offset(x, 0),
+        Offset(x + size.height * 0.4, size.height),
+        paint,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

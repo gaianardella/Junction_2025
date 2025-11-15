@@ -4,10 +4,11 @@ import 'activity_page.dart';
 import 'ticket_page.dart';
 import 'goals_page.dart';
 import 'badges_page.dart';
+import 'learning_path_page.dart';
 
 // Global variables (updated theme: blue and orange)
 final Color primaryBlue = Color(0xFF1E88E5);
-final Color accentOrange = Color(0xFFFF6D00);
+final Color accentOrange = Color(0xFF3A9C9F);
 final String userName = "Sarah";
 
 class HomePage extends StatefulWidget {
@@ -31,11 +32,12 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _pages = [
-      HomeContent(onGoToGoals: () => _onItemTapped(1)), // Separate class for home content
-      GoalsPage(),
+      HomeContent(onGoToGoals: () => _onItemTapped(5)), // Separate class for home content
+      LearningPathPage(),
       ActivityPage(),
       TicketsPage(),
       BadgesPage(),
+      GoalsPage(),
     ];
   }
 
@@ -45,7 +47,7 @@ class _HomePageState extends State<HomePage> {
       body: _pages[_selectedIndex],
       bottomNavigationBar: BottomAppBar(
         shape: CircularNotchedRectangle(),
-        color: primaryBlue,
+        color: accentOrange,
         notchMargin: 8,
         height: 70, // Bottom bar height
         child: Row(
@@ -63,7 +65,7 @@ class _HomePageState extends State<HomePage> {
             IconButton(
               icon: Icon(Icons.groups, color: Colors.white),
               onPressed: () => _onItemTapped(1),
-              tooltip: 'Goals',
+              tooltip: 'Learn',
             ),
             IconButton(
               icon: Icon(Icons.military_tech, color: Colors.white),
@@ -74,11 +76,11 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.white,
+        backgroundColor: accentOrange,
         onPressed: () => _onItemTapped(0),
         shape: CircleBorder(),
         elevation: 4,
-        child: Icon(Icons.home, color: primaryBlue, size: 30),
+        child: Icon(Icons.home, color: Colors.white, size: 30),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
@@ -97,11 +99,18 @@ class _HomeContentState extends State<HomeContent> {
   // Demo current balance
   final double currentBalance = 12450.00;
   // Small saving goals to show top-right with progress bars
-  final List<Map<String, dynamic>> savingGoals = [
-    {'title': 'Europe Trip', 'progress': 0.35},
-    {'title': 'New Bike', 'progress': 0.6},
-    {'title': 'Emergency Fund', 'progress': 0.15},
-  ];
+  List<Map<String, dynamic>> get savingGoals => [
+        {
+          'title': 'Gaming PC',
+          'progress': 0.35,
+          'color': Color(0xFF6A1B9A), // same purple as GoalsPage
+        },
+        {
+          'title': 'Europe Trip',
+          'progress': 0.60,
+          'color': Color(0xFF0288D1), // same azure as GoalsPage
+        },
+      ];
   // Carousel controller
   final PageController _carouselController = PageController(viewportFraction: 0.9);
   int _carouselIndex = 0;
@@ -119,7 +128,7 @@ class _HomeContentState extends State<HomeContent> {
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [primaryBlue, primaryBlue.withOpacity(0.85)],
+                colors: [accentOrange, accentOrange.withOpacity(0.85)],
               ),
               boxShadow: [
                 BoxShadow(
@@ -221,7 +230,15 @@ class _HomeContentState extends State<HomeContent> {
                             value: (g['progress'] as double),
                             minHeight: 8,
                             backgroundColor: Colors.white.withOpacity(0.25),
-                            valueColor: AlwaysStoppedAnimation<Color>(accentOrange),
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              (g['color'] is Color)
+                                  ? (g['color'] as Color)
+                                  : ((g['title'] == 'Gaming PC')
+                                      ? Color(0xFF6A1B9A)
+                                      : (g['title'] == 'Europe Trip'
+                                          ? Color(0xFF0288D1)
+                                          : Color(0xFF5865A5))),
+                            ),
                           ),
                         ),
                       ],

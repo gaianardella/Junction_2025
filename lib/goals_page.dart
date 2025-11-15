@@ -3,7 +3,7 @@ import 'widgets/avatar_widget.dart';
 
 // --- Theme Colors ---
 final Color primaryBlue = Color(0xFF00468C);
-final Color accentOrange = Color(0xFFF77F00);
+final Color accentOrange = Color(0xFF3A9C9F);
 final Color lightBlue = Color(0xFFE3F2FD);
 final Color softOrange = Color(0xFFFFF3E0);
 final Color successGreen = Color(0xFF4CAF50);
@@ -142,9 +142,12 @@ class _GoalsPageState extends State<GoalsPage> with TickerProviderStateMixin {
             expandedHeight: 120,
             floating: false,
             pinned: true,
+            toolbarHeight: 72,
+            collapsedHeight: 72,
             backgroundColor: primaryBlue,
             elevation: 0,
             flexibleSpace: FlexibleSpaceBar(
+              collapseMode: CollapseMode.pin,
               background: Container(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
@@ -154,34 +157,40 @@ class _GoalsPageState extends State<GoalsPage> with TickerProviderStateMixin {
                   ),
                 ),
                 child: SafeArea(
+                  bottom: false,
                   child: Padding(
-                    padding: EdgeInsets.fromLTRB(20, 40, 20, 16),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Text(
-                              'Your Goals',
-                              style: TextStyle(
-                                fontSize: 28,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                    padding: EdgeInsets.fromLTRB(20, 8, 20, 12),
+                    child: Align(
+                      alignment: Alignment.bottomLeft,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                'Your Goals',
+                                style: TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
                               ),
-                            ),
-                            Text(
-                              'Track & Achieve 🎯',
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.white70,
+                              SizedBox(height: 2),
+                              Text(
+                                'Track & Achieve 🎯',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.white70,
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                        AvatarWidget(),
-                      ],
+                            ],
+                          ),
+                          AvatarWidget(),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -206,11 +215,7 @@ class _GoalsPageState extends State<GoalsPage> with TickerProviderStateMixin {
 
                 // AI Showcase
                 _buildAIGoalShowcase(),
-
-                SizedBox(height: 32),
-
-                // Upcoming Goals
-                _buildUpcomingGoalsList(),
+                
 
                 SizedBox(height: 100),
               ],
@@ -515,26 +520,7 @@ class _GoalsPageState extends State<GoalsPage> with TickerProviderStateMixin {
 
                         SizedBox(height: 12),
 
-                        // Interest Rate Badge
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.trending_up,
-                              color: successGreen,
-                              size: 16,
-                            ),
-                            SizedBox(width: 4),
-                            Text(
-                              '${goal.interestRate.toStringAsFixed(1)}% interest rate',
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                                color: successGreen,
-                              ),
-                            ),
-                          ],
-                        ),
+                        // Interest rate removed
                       ],
                     ),
                   ),
@@ -708,6 +694,7 @@ class _GoalsPageState extends State<GoalsPage> with TickerProviderStateMixin {
   }
 
   Widget _buildAccomplishedGoalCard(AccomplishedGoal goal) {
+    final Color baseColor = _colorForAccomplishedGoal(goal);
     return Container(
       width: 160,
       margin: EdgeInsets.only(right: 12),
@@ -715,7 +702,7 @@ class _GoalsPageState extends State<GoalsPage> with TickerProviderStateMixin {
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
         elevation: 4,
-        shadowColor: purpleAccent.withOpacity(0.2),
+        shadowColor: baseColor.withOpacity(0.2),
         child: InkWell(
           borderRadius: BorderRadius.circular(20),
           onTap: () => print('Start Goal: ${goal.title}'),
@@ -732,8 +719,8 @@ class _GoalsPageState extends State<GoalsPage> with TickerProviderStateMixin {
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                           colors: [
-                            purpleAccent.withOpacity(0.7),
-                            primaryBlue.withOpacity(0.7),
+                            baseColor,
+                            baseColor.withOpacity(0.7),
                           ],
                         ),
                         borderRadius: BorderRadius.only(
@@ -764,24 +751,7 @@ class _GoalsPageState extends State<GoalsPage> with TickerProviderStateMixin {
                             overflow: TextOverflow.ellipsis,
                           ),
                           Spacer(),
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.location_on_outlined,
-                                size: 12,
-                                color: Colors.grey[500],
-                              ),
-                              SizedBox(width: 4),
-                              Text(
-                                goal.region,
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  color: Colors.grey[600],
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 2),
+                          
                           Text(
                             '€${goal.amount.toStringAsFixed(0)}',
                             style: TextStyle(
@@ -819,151 +789,28 @@ class _GoalsPageState extends State<GoalsPage> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildUpcomingGoalsList() {
-    final upcoming = userGoals.skip(_currentGoalIndex + 1).toList();
-
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(Icons.flag_outlined, color: accentOrange, size: 24),
-              SizedBox(width: 8),
-              Text(
-                'Next in Line',
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 16),
-          if (upcoming.isEmpty)
-            Container(
-              padding: EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: lightBlue,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.check_circle_outline,
-                    color: primaryBlue,
-                    size: 32,
-                  ),
-                  SizedBox(width: 16),
-                  Expanded(
-                    child: Text(
-                      'All caught up! Focus on your current goal or add a new one.',
-                      style: TextStyle(color: primaryBlue),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ...upcoming.asMap().entries.map((entry) {
-            int idx = entry.key;
-            SavingsGoal goal = entry.value;
-            return _buildUpcomingGoalItem(goal, idx);
-          }).toList(),
-        ],
-      ),
-    );
+  Color _colorForAccomplishedGoal(AccomplishedGoal goal) {
+    final String title = goal.title.toLowerCase();
+    if (title.contains('car')) {
+      // Yellow (amber) for Car
+      return Color(0xFFFFC107);
+    }
+    if (title.contains('festival')) {
+      // Green for Festival
+      return successGreen;
+    }
+    // Deterministic pick from palette for others
+    final List<Color> palette = [
+      accentOrange,
+      primaryBlue,
+      purpleAccent,
+      successGreen,
+    ];
+    final int index = goal.title.codeUnits.fold(0, (a, b) => a + b) % palette.length;
+    return palette[index];
   }
 
-  Widget _buildUpcomingGoalItem(SavingsGoal goal, int index) {
-    return Container(
-      margin: EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: Offset(0, 2),
-          ),
-        ],
-      ),
-      child: ListTile(
-        contentPadding: EdgeInsets.all(16),
-        leading: Container(
-          width: 56,
-          height: 56,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                goal.customColor?.withOpacity(0.2) ??
-                    primaryBlue.withOpacity(0.2),
-                goal.customColor?.withOpacity(0.1) ??
-                    primaryBlue.withOpacity(0.1),
-              ],
-            ),
-            borderRadius: BorderRadius.circular(14),
-          ),
-          child: Center(
-            child: Text(goal.emojiLevel, style: TextStyle(fontSize: 28)),
-          ),
-        ),
-        title: Text(
-          goal.name,
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-        ),
-        subtitle: Padding(
-          padding: EdgeInsets.only(top: 8),
-          child: Row(
-            children: [
-              _buildInfoChip(
-                '€${goal.targetAmount.toStringAsFixed(0)}',
-                Icons.savings_outlined,
-              ),
-              SizedBox(width: 8),
-              _buildInfoChip('${goal.daysRemaining}d', Icons.schedule),
-            ],
-          ),
-        ),
-        trailing: Container(
-          padding: EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: accentOrange.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Icon(Icons.arrow_forward, color: accentOrange, size: 20),
-        ),
-        onTap: () => print('View Goal: ${goal.name}'),
-      ),
-    );
-  }
-
-  Widget _buildInfoChip(String text, IconData icon) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: Colors.grey[100],
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 12, color: Colors.grey[600]),
-          SizedBox(width: 4),
-          Text(
-            text,
-            style: TextStyle(
-              fontSize: 11,
-              color: Colors.grey[700],
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  // Removed "Next in Line" section and related helpers
 
   Widget _buildEmptyState() {
     return Container(
