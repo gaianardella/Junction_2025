@@ -9,7 +9,6 @@
 - **Game-based financial education**
   - [The effects of game-based financial education – New survey evidence from lower-secondary school students in Finland](The effects of game-based financial education New survey evidence from lower-secondary school students in Finland.md)
 
-
 ## Product context (for interpreting the papers)
 
 - **Core product idea**: Mobile “savings coach” app that reads transaction data from bank accounts (one-way only, no payments), analyzes spending, and helps young people:
@@ -19,7 +18,6 @@
   - Build self-control and resistance to digital nudging and impulse buying.
 - **Target users**: Finnish youth and young adults (school age to early independence), including a **neurodivergent-first design** that should still work well for neurotypical users.
 - **Stakeholders**: Banks (fewer overdrafts, better long-term customer relationships) and schools (plug-in digital financial literacy module aligned with current research in Finland).
-
 
 ## Real vs virtual money: modes and safety
 
@@ -33,6 +31,7 @@
 ### Two clearly separated modes
 
 - **Virtual money / simulation mode**:
+  
   - Purpose: safe **resource-management-style game** using **virtual money** to practice decisions (e.g. “You earn 3 000€; allocate it across rent, food, wants, savings and see what happens.”).
   - Visual/UX:
     - Distinct theme (e.g. warm color scheme) and a persistent label such as **“SIMULATION – NOT REAL MONEY”**.
@@ -44,6 +43,7 @@
     - Before starting a quest with money, show a short confirmation that this is **virtual-only** and does **not** affect the real account.
 
 - **Real account (read-only) mode**:
+  
   - Purpose: show and analyze **actual bank data** (if user connects an account) to build the Smart Spending Profile, 3-category budget, and nudges.
   - Visual/UX:
     - Different, more neutral/serious theme (e.g. blue/grey) and a clear banner like **“REAL ACCOUNT DATA (read-only)”**.
@@ -61,8 +61,6 @@
 - Aligns with **Rahko & Kalmi** and **Nyrhinen et al.**:
   - Game-based and impulse-related experiments in the literature are typically run in **safe, non-monetary environments**; our simulation mode provides that.
   - Real mode still respects user control and avoids any hidden manipulation of real funds, supporting long-term trust.
-
-
 
 ## Gamification Strategies – A Characterization Using Formal Argumentation Theory
 
@@ -90,6 +88,7 @@ Source: [Gamification Strategies – A Characterization Using Formal Argumentati
 ### How we use it in the app
 
 - **User model \((G,V,E)\) (simplified)**:
+  
   - We capture a lightweight version of goals, values, and emotions via onboarding and periodic questions:
     - **Goals (G)**: e.g. “build 500€ buffer”, “avoid credit card debt”, “save for moving out”.
     - **Values (V)**: e.g. “security”, “freedom”, “fun/experiences”.
@@ -98,6 +97,7 @@ Source: [Gamification Strategies – A Characterization Using Formal Argumentati
     - Different \(G,V,E\) combinations trigger different **strategies** and **content types**.
 
 - **Explicit use of content taxonomy**:
+  
   - **Measuring content**:
     - Spending per category, time-based spending graphs, “days until money runs out at current pace”.
     - Visualizations of how much is going to subscriptions, micro-transactions, BNPL, etc.
@@ -109,6 +109,7 @@ Source: [Gamification Strategies – A Characterization Using Formal Argumentati
     - Social norms framed carefully (no shaming, no public rankings).
 
 - **Explicit use of strategy taxonomy**:
+  
   - **Nudges (proactive)**:
     - Default settings like “auto-save 5–10% of income into your buffer goal” (user can always change them).
     - Highlighted “recommended” options in simulations (with transparent explanations that this is a nudge).
@@ -124,13 +125,14 @@ Source: [Gamification Strategies – A Characterization Using Formal Argumentati
     - Simple “what-if” simulations where users adjust sliders (subscriptions, food, fun) and see impact on **time-to-goal** and “safety buffer”.
 
 - **Dialogue pattern from STAR-C and TalousTandem**:
+  
   - Each “interaction” is a mini dialogue:
     - Coach presents a situation (card) → user chooses → coach responds with feedback and possibly a follow-up suggestion.
   - This aligns with the paper’s view of gamified stories as **argument-based dialogues**.
 
 - **Research story to explain this**:
+  
   - “We use Guerrero et al.’s content and strategy taxonomies and the \((G,V,E)\) user model to decide when to show measuring vs informational vs social content and when to use nudges, challenges, stories, progress, or simulations. The app behaves like a lightweight ‘persuader agent’ that adapts its coaching to the user’s goals, values, and emotional state.”
-
 
 ## Financial literacy in the digital age—A research agenda
 
@@ -158,6 +160,7 @@ Source: [Financial literacy in the digital age—A research agenda](Financial li
 ### How we use it in the app
 
 - **Three content pillars directly aligned with the three themes**:
+  
   - **Fintech pillar**:
     - For each relevant product in the user’s data (card, overdraft facility, BNPL, savings account, investment account), generate:
       - Plain-language explanations of how it works and when it becomes risky.
@@ -173,19 +176,21 @@ Source: [Financial literacy in the digital age—A research agenda](Financial li
     - Always explain that these are nudges and why they are used, addressing the ethical concerns raised in the paper.
 
 - **Measurement approach inspired by their recommendations**:
+  
   - Attach **short scenario-based questions** to key missions:
     - Before and after a mission on, for example, mobile payments, ask the user to choose between options in a realistic scenario (knowledge/problem-solving).
   - Separate **knowledge gains** (scenario answers) from **behavior changes** (actual spending and saving patterns over time).
 
 - **Curriculum and stakeholder fit**:
+  
   - For **schools**:
     - Missions can be grouped into “Fintech”, “Digital behavior”, and “Behavioral interventions” modules that mirror the research agenda and can plug into digital literacy or financial literacy courses.
   - For **banks and regulators**:
     - The app addresses concrete risks identified in the paper (over-indebtedness, fraud, profiling, digital nudging) and provides a channel to support customers’ digital financial literacy without promoting specific products.
 
 - **Research story to explain this**:
+  
   - “Following Koskelainen et al., our content is organized around three themes: Fintech, financial behavior in digital environments, and behavioral interventions. We explicitly teach about digital risks (loss of tangibility, profiling, nudging) and use problem-based tasks instead of only multiple-choice trivia to reflect digital financial literacy, while keeping behavior change grounded in the user’s real bank data.”
-
 
 ## Online antecedents for young consumers' impulse buying behavior
 
@@ -216,6 +221,7 @@ Source: [Online antecedents for young consumers' impulse buying behavior](Online
 ### How we use it in the app
 
 - **Risk profile based on their constructs**:
+  
   - Short onboarding/periodic questions derived from their scales (or simplified versions):
     - Self-control items (e.g. difficulty in resisting impulses, acting without thinking of alternatives).
     - Attitude toward targeted advertising (e.g. finding personalized ads helpful and relevant).
@@ -229,6 +235,7 @@ Source: [Online antecedents for young consumers' impulse buying behavior](Online
     - Decide how strongly to emphasize **media literacy** explanations.
 
 - **Impulse pattern detection in spending data**:
+  
   - Using the bank data, we look for patterns that likely reflect impulse buying, guided by the study’s findings:
     - Clusters of small, discretionary purchases within short time windows.
     - Late-night purchases in certain categories.
@@ -237,6 +244,7 @@ Source: [Online antecedents for young consumers' impulse buying behavior](Online
     - “In the past 30 days, approximately X% of your spending looks impulse-like; that’s about Y€ that did not go into your savings goal Z.”
 
 - **Self-control and media-literacy tools**:
+  
   - **Cooling-off rules**:
     - The user can choose time-based or category-based “cool-downs” (e.g. 24h wait before non-essential purchases).
     - The app tracks these and reflects how much money was redirected to goals due to delayed purchases.
@@ -252,8 +260,29 @@ Source: [Online antecedents for young consumers' impulse buying behavior](Online
     - These directly address the pathways identified in the paper.
 
 - **Research story to explain this**:
+  
   - “We use Nyrhinen et al.’s model of low self-control, attitudes to targeted ads, and impulsive social networks as a blueprint for our ‘impulse radar’. We estimate susceptibility using short questions and bank data, then offer concrete tools — cooling-off rules, impulse pattern feedback, and targeted media literacy lessons — that intervene on exactly the pathways their study identifies.”
 
+### Detecting emerging impulse buying patterns over time
+
+- **Why**:
+  - Nyrhinen et al. show that impulse buying is linked to low self-control, positive attitudes toward targeted ads, and the impulsiveness of social networks.
+  - Awareness is a prerequisite for change: users often do not recognize when they have slipped into a more impulsive pattern.
+- **How (high-level)**:
+  - Use a **rolling time window** (e.g. last 30–90 days) to compute simple indicators, such as:
+    - Frequency and clustering of small discretionary transactions.
+    - Late-night or “emotionally charged” category spending (e.g. food delivery, fast fashion, in-app purchases).
+    - Deviation from the user’s own historical baseline (spending spikes).
+  - Combine these indicators with the self-control / attitude profile to flag periods that likely reflect **heightened impulse buying** rather than isolated purchases.
+  - When a threshold is crossed, trigger:
+    - A **gentle, informational warning** (“Your recent spending pattern looks more impulsive than usual; want to review it together?”).
+    - Adaptive content in quests and lessons (prioritizing self-control and media literacy modules).
+- **Ethical considerations**:
+  - The app cannot and will not block or reverse transactions; it only **analyzes and informs**.
+  - Messaging should:
+    - Avoid blame or alarmism.
+    - Emphasize user agency and options (“here are some tools you can choose to use”) rather than directive commands.
+  - This aligns with the paper’s emphasis on strengthening self-control and online media literacy, without overstepping the app’s actual powers over the user’s finances.
 
 ## The effects of game-based financial education – New survey evidence from lower-secondary school students in Finland
 
@@ -276,12 +305,14 @@ Source: [The effects of game-based financial education – New survey evidence f
 ### How we use it in the app
 
 - **Realistic expectations from gamification**:
+  
   - We treat **game-like elements primarily as knowledge and awareness tools**, not as magic behavior-change levers.
   - We design short missions and simulations to:
     - Explain trade-offs (e.g. spending vs saving, BNPL vs waiting).
     - Build mental models of money flows.
 
 - **Critical twist: connecting missions to real actions**:
+  
   - Unlike school-based interventions, the app sees **real transactions** and can propose immediate, concrete actions after each mission:
     - After a mission on emergency funds: suggest starting or adjusting a real savings rule in the connected bank.
     - After a mission on subscriptions: list actual low-use subscriptions and help the user plan which to cancel.
@@ -290,14 +321,15 @@ Source: [The effects of game-based financial education – New survey evidence f
     - Opportunity and support for action come from the integration with real bank data and nudges.
 
 - **Designing for school integration**:
+  
   - For school use, the app’s missions can be chosen as:
     - Short, classroom-friendly tasks that demonstrate key concepts.
     - Followed by homework-style actions where students plan, simulate, or track real behavior (within constraints appropriate for their age).
   - The research provides local (Finnish) evidence that **game-based formats are credible** for schools, as long as expectations around behavior change are realistic.
 
 - **Research story to explain this**:
+  
   - “Rahko and Kalmi show that game-based financial education in Finnish lower-secondary schools reliably improves financial knowledge but has limited short-term impact on behavior. Our design respects this: we use missions and simulations to build understanding, then tie them directly to real transaction data and concrete follow-up actions, so that increased knowledge has an immediate channel for behavior change.”
-
 
 ## PISA 2022 context and implications for design
 
@@ -315,12 +347,14 @@ Source: [The effects of game-based financial education – New survey evidence f
 ### How we reflect this in the app
 
 - **Low dependence on strong math skills**:
+  
   - Avoid heavy numeric tasks and complex formulas in the UI.
   - Prefer:
     - Simple visualizations (bars, timelines, “time-to-goal” rather than compound-interest math).
     - Intuitive comparisons (e.g. “two extra weeks of safety” instead of “+3.7% return”).
 
 - **High leverage of creative thinking ability**:
+  
   - Treat missions as **creative planning and scenario design**, not calculation drills:
     - “Design a monthly plan that lets you buy X and still save Y for your buffer.”
     - “Re-balance this budget so Future-You is safer without removing all fun.”
@@ -329,13 +363,13 @@ Source: [The effects of game-based financial education – New survey evidence f
     - Choosing how strict or gentle the nudges should be.
 
 - **Gender- and inclusion-aware framing**:
+  
   - For many girls (who score high in creative thinking but may be less confident in finance), emphasize:
     - Self-efficacy, narrative explanations, and ownership over plans.
   - For many boys (where risk awareness is a concern), emphasize:
     - Risk simulations and clear consequences of high-risk behaviors (e.g. overuse of BNPL or credit).
   - For neurodivergent youth, emphasize:
     - Predictable flows, low sensory load, and user control over pacing and interface complexity.
-
 
 ## Neurodivergent-first design (cross-cutting)
 
