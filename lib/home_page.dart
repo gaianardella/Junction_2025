@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'widgets/avatar_widget.dart';
 import 'activity_page.dart';
-import 'ticket_page.dart';
+import 'expense_page.dart';
 import 'goals_page.dart';
 import 'badges_page.dart';
 import 'learning_path_page.dart';
@@ -35,7 +35,7 @@ class _HomePageState extends State<HomePage> {
       HomeContent(onGoToGoals: () => _onItemTapped(5)), // Separate class for home content
       LearningPathPage(),
       ActivityPage(),
-      TicketsPage(),
+      ExpensePage(),
       BadgesPage(),
       GoalsPage(),
     ];
@@ -44,6 +44,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xFF0D1B2A),
       body: _pages[_selectedIndex],
       bottomNavigationBar: BottomAppBar(
         shape: CircularNotchedRectangle(),

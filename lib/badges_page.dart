@@ -1,117 +1,144 @@
 import 'package:flutter/material.dart';
-import 'aes_helper.dart';
-import 'qr_scanner_page.dart';
 import 'widgets/avatar_widget.dart';
+import 'monthly_challenge_page.dart';
 
 class BadgesPage extends StatefulWidget {
   @override
   _BadgesPageState createState() => _BadgesPageState();
 }
 
-
 class _BadgesPageState extends State<BadgesPage> {
-  final Color virginRed = Color(0xFFE50914);
-  List<String> badgeImages = List.generate(6, (index) => 'assets/badge_${index+1}.png');
+  final Color backgroundBlue = Color(0xFF0D1B2A);
+  final Color accent = Color(0xFF3A9C9F);
+  final List<Map<String, dynamic>> leaderboard = [
+    {'name': 'Sarah', 'points': 7520, 'me': true},
+    {'name': 'Alex', 'points': 7210},
+    {'name': 'Mika', 'points': 6900},
+    {'name': 'Jon', 'points': 6415},
+    {'name': 'Priya', 'points': 6100},
+  ];
 
-  void updateImage(int index, String newImagePath) {
-    if (!mounted) return; // Prevent updating if widget is unmounted
-    setState(() {
-      badgeImages[index] = newImagePath;
-    });
-  }
-
-  void _scanQRCode(BuildContext context) async {
-    final scannedCode = await Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => QrCodeScanner()),
+  void _openMonthlyChallenge() {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => MonthlyChallengePage()),
     );
-
-    if (scannedCode != null) {
-      for (int i = 0; i < badgeImages.length; i++) {
-        if (AESHelper.decrypt(scannedCode) == 'badge_${i+1}.png') {
-          // print('Scanning: $scannedCode');
-          // print('Updating to: assets/badge_${i+1}_taken.png');
-          updateImage(i, 'assets/badge_${i+1}_taken.png'); // Replace with your new image
-          break;
-        }
-      }
-    } else {
-      print("No QR code scanned.");
-    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: backgroundBlue,
       appBar: AppBar(
-        title: Text(
-          'Badges',
-          style: TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.w500,
-            color: Colors.white,
-          ),
-        ),
+        title: Text('Scoreboard', style: TextStyle(color: Colors.white)),
+        backgroundColor: accent,
         actions: [
-          // Avatar at top right
           Padding(
             padding: EdgeInsets.only(right: 16),
-            child: AvatarWidget(
-            ),
+            child: AvatarWidget(),
           ),
         ],
-        backgroundColor: virginRed,
       ),
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: GridView.builder(
-              padding: EdgeInsets.only(bottom: 80), // Prevents button from covering the last row
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2, // 2 columns
-                crossAxisSpacing: 8.0,
-                mainAxisSpacing: 8.0,
-              ),
-              itemCount: badgeImages.length,
-              itemBuilder: (context, index) {
-                return Card(
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: Image.asset(
-                      badgeImages[index],
-                      fit: BoxFit.cover,
+      body: SingleChildScrollView(
+        padding: EdgeInsets.fromLTRB(16, 16, 16, 24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Monthly challenge banner
+            GestureDetector(
+              onTap: _openMonthlyChallenge,
+              child: Container(
+                padding: EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: accent.withOpacity(0.15),
+                  border: Border.all(color: accent.withOpacity(0.4)),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: accent,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(Icons.flag, color: Colors.white),
                     ),
-                  ),
-                );
-              },
-            ),
-          ),
-
-          Positioned(
-            bottom: 35,
-            left: 0,
-            right: 0,
-            child: Center(
-              child: ElevatedButton(
-                onPressed: () => _scanQRCode(context),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: virginRed,
-                  padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-                ),
-                child: Text(
-                  'Scan QR Code',
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.white,
-                  ),
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('New Monthly Challenge', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                          SizedBox(height: 4),
+                          Text('Tap to play a quick financial story', style: TextStyle(color: Colors.white70, fontSize: 12)),
+                        ],
+                      ),
+                    ),
+                    Icon(Icons.chevron_right, color: Colors.white70),
+                  ],
                 ),
               ),
             ),
-          ),
-        ],
+            SizedBox(height: 20),
+            // Scoreboard
+            Container(
+              padding: EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.04),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: Colors.white12),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.leaderboard, color: accent),
+                      SizedBox(width: 8),
+                      Text('Leaderboard', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 16)),
+                    ],
+                  ),
+                  SizedBox(height: 12),
+                  ...leaderboard.asMap().entries.map((entry) {
+                    final idx = entry.key;
+                    final user = entry.value;
+                    final bool me = user['me'] == true;
+                    return Container(
+                      margin: EdgeInsets.only(bottom: 8),
+                      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: me ? accent.withOpacity(0.12) : Colors.white.withOpacity(0.02),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: me ? accent.withOpacity(0.5) : Colors.white10),
+                      ),
+                      child: Row(
+                        children: [
+                          Text('${idx + 1}', style: TextStyle(color: Colors.white70, fontWeight: FontWeight.bold)),
+                          SizedBox(width: 12),
+                          CircleAvatar(
+                            radius: 14,
+                            backgroundColor: accent.withOpacity(0.2),
+                            child: Text(user['name'][0], style: TextStyle(color: Colors.white)),
+                          ),
+                          SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              user['name'],
+                              style: TextStyle(color: Colors.white, fontWeight: me ? FontWeight.w700 : FontWeight.w500),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          SizedBox(width: 10),
+                          Text('${user['points']} pts', style: TextStyle(color: Colors.white70)),
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

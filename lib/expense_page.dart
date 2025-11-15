@@ -14,7 +14,7 @@ final String userName = "Sarah";
 final Color mainDarkBlue = Color(0xFF0D1B2A);
 final Color expenseSectionBackground = Color(0xFF18181A);
 
-class TicketsPage extends StatelessWidget {
+class ExpensePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ExpenseTrackerContent();
@@ -201,7 +201,7 @@ class _ExpenseTrackerContentState extends State<ExpenseTrackerContent>
                         ),
                       ],
                     ),
-                    SizedBox(height: 32),
+                    SizedBox(height: 16),
                     _buildAnimatedChartWithBalance(),
                   ],
                 ),

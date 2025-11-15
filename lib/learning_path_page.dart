@@ -41,7 +41,7 @@ class _LearningPathPageState extends State<LearningPathPage> {
     final List<_PathItem> items =
         _items.isNotEmpty ? _items : _buildItemsWithSections(nodes, _sectionsSpec());
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: Color(0xFF0D1B2A),
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
