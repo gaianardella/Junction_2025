@@ -4,6 +4,7 @@ import 'activity_page.dart';
 import 'ticket_page.dart';
 import 'goals_page.dart';
 import 'badges_page.dart';
+import 'learning_path_page.dart';
 
 // Global variables (updated theme: blue and orange)
 final Color primaryBlue = Color(0xFF1E88E5);
@@ -31,11 +32,12 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _pages = [
-      HomeContent(onGoToGoals: () => _onItemTapped(1)), // Separate class for home content
-      GoalsPage(),
+      HomeContent(onGoToGoals: () => _onItemTapped(5)), // Separate class for home content
+      LearningPathPage(),
       ActivityPage(),
       TicketsPage(),
       BadgesPage(),
+      GoalsPage(),
     ];
   }
 
@@ -63,7 +65,7 @@ class _HomePageState extends State<HomePage> {
             IconButton(
               icon: Icon(Icons.groups, color: Colors.white),
               onPressed: () => _onItemTapped(1),
-              tooltip: 'Goals',
+              tooltip: 'Learn',
             ),
             IconButton(
               icon: Icon(Icons.military_tech, color: Colors.white),
