@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'quiz_page.dart';
+import 'budget_course_page.dart';
 
 class LearningPathPage extends StatefulWidget {
   @override
@@ -150,23 +150,32 @@ class _LearningPathPageState extends State<LearningPathPage> {
   }
 
   Widget _buildSectionRow(String title) {
+    final Color c = _sectionColor(title);
     return Padding(
       padding: const EdgeInsets.fromLTRB(4, 18, 4, 10),
       child: Row(
         children: [
-          Expanded(child: Container(height: 1, color: Colors.white24)),
+          Expanded(child: Container(height: 1, color: c.withOpacity(0.5))),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: Text(
-              title,
-              style: TextStyle(
-                color: Colors.white.withOpacity(0.9),
-                fontWeight: FontWeight.w700,
-                letterSpacing: 0.2,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: c.withOpacity(0.12),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: c.withOpacity(0.7)),
+              ),
+              child: Text(
+                title,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.2,
+                ),
               ),
             ),
           ),
-          Expanded(child: Container(height: 1, color: Colors.white24)),
+          Expanded(child: Container(height: 1, color: c.withOpacity(0.5))),
         ],
       ),
     );
@@ -182,14 +191,14 @@ class _LearningPathPageState extends State<LearningPathPage> {
     final IconData icon =
         isLocked ? Icons.lock_outline : (isCurrent ? Icons.play_arrow_rounded : Icons.check);
 
-    final bool launchQuiz =
+    final bool openBudgetCourse =
         !isLocked && title.toLowerCase().trim() == 'budgeting 101';
 
     return InkWell(
-      onTap: launchQuiz
+      onTap: openBudgetCourse
           ? () {
               Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => QuizPage()),
+                MaterialPageRoute(builder: (_) => BudgetCoursePage()),
               );
             }
           : null,
@@ -314,6 +323,17 @@ class _SectionSpec {
   final String title;
   final int count;
   _SectionSpec(this.title, this.count);
+}
+
+Color _sectionColor(String title) {
+  // Match colors used in expense_page pie sections:
+  // Red: 0xFFE53935, Blue: 0xFF42A5F5, Amber: 0xFFFFA000, Orange: 0xFFFF8F00, LightBlue: 0xFF64B5F6
+  final t = title.toLowerCase();
+  if (t.contains('foundation')) return const Color(0xFF42A5F5); // blue
+  if (t.contains('money')) return const Color(0xFFFFA000); // amber
+  if (t.contains('saving')) return const Color(0xFF64B5F6); // light blue
+  if (t.contains('invest')) return const Color(0xFFE53935); // red
+  return const Color(0xFFFF8F00); // fallback orange
 }
 
 

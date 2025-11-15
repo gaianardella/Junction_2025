@@ -5,6 +5,7 @@ import 'expense_page.dart';
 import 'goals_page.dart';
 import 'badges_page.dart';
 import 'learning_path_page.dart';
+import 'budget_course_page.dart';
 
 // Global variables (updated theme: blue and orange)
 final Color primaryBlue = Color(0xFF1E88E5);
@@ -171,6 +172,12 @@ class _HomeContentState extends State<HomeContent> {
             ),
           ),
 
+          // Continue where you left off
+          Padding(
+            padding: EdgeInsets.fromLTRB(16, 18, 16, 0),
+            child: _buildContinueCard(),
+          ),
+
           // Saving goals (above balance)
           Padding(
             padding: EdgeInsets.fromLTRB(16, 18, 16, 4),
@@ -334,6 +341,118 @@ class _HomeContentState extends State<HomeContent> {
           ),
 
           SizedBox(height: 16),
+        ],
+      ),
+    );
+  }
+
+  void _openBudgetCourse() {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => BudgetCoursePage()),
+    );
+  }
+
+  Widget _buildContinueCard() {
+    final double progress = 0.35; // Example saved progress
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: Colors.grey.withOpacity(0.2),
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 20,
+            offset: Offset(0, 10),
+          ),
+        ],
+      ),
+      padding: EdgeInsets.fromLTRB(16, 16, 16, 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Continue where you left off',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          SizedBox(height: 12),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SizedBox(
+                width: 70,
+                height: 70,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    SizedBox(
+                      width: 70,
+                      height: 70,
+                      child: CircularProgressIndicator(
+                        value: progress,
+                        strokeWidth: 6,
+                        backgroundColor: Colors.white24,
+                        valueColor: AlwaysStoppedAnimation<Color>(accentOrange),
+                      ),
+                    ),
+                    Text(
+                      '${(progress * 100).toStringAsFixed(0)}%',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Budgeting 101',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      'Mini-course on budgeting basics',
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 12),
+          Align(
+            alignment: Alignment.centerRight,
+            child: ElevatedButton.icon(
+              onPressed: _openBudgetCourse,
+              icon: Icon(Icons.play_arrow, size: 18),
+              label: Text('Continue'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: accentOrange,
+                foregroundColor: Colors.white,
+                padding: EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                elevation: 0,
+              ),
+            ),
+          ),
         ],
       ),
     );
