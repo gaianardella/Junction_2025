@@ -1,0 +1,30 @@
+# Ignore virtual environment
+.venv/
+
+# Ignore local environment variables (never include secrets)
+.env
+
+# Python cache and junk files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# macOS junk
+.DS_Store
+
+# Git metadata
+.git
+.gitignore
+
+# Editor/project files
+.vscode/
+.idea/
+
+# Large or unnecessary files
+*.pdf
+*.log
+
+# Temporary files
+tmp/
+
