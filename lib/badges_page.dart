@@ -132,6 +132,10 @@ class _BadgesPageState extends State<BadgesPage>
                   ),
                 ),
 
+                // Monthly Challenge banner
+                _buildChallengeBanner(),
+                SizedBox(height: 16),
+
                 // Stats overview
                 _buildStatsOverview(),
                 SizedBox(height: 20),
