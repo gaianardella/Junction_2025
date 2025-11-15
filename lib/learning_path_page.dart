@@ -104,9 +104,14 @@ class _LearningPathPageState extends State<LearningPathPage> {
                   if (item.type == _PathItemType.section) {
                     return _buildSectionRow(item.title);
                   } else {
-                    return _buildLessonTile(
-                      title: item.title,
-                      status: item.status ?? _NodeStatus.locked,
+                    final Color sectionColor = _findSectionColor(items, index);
+                    return _animatedSlideInFromRight(
+                      index: index,
+                      child: _buildLessonTile(
+                        title: item.title,
+                        status: item.status ?? _NodeStatus.locked,
+                        sectionColor: sectionColor,
+                      ),
                     );
                   }
                 },
@@ -116,6 +121,33 @@ class _LearningPathPageState extends State<LearningPathPage> {
         ),
       ),
     );
+  }
+
+  Widget _animatedSlideInFromRight({required int index, required Widget child}) {
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0.0, end: 1.0),
+      duration: Duration(milliseconds: 400 + (index * 100)),
+      curve: Curves.easeInOut,
+      builder: (context, value, c) {
+        return Transform.translate(
+          offset: Offset(20 * (1 - value), 0),
+          child: Opacity(
+            opacity: value,
+            child: c,
+          ),
+        );
+      },
+      child: child,
+    );
+  }
+
+  Color _findSectionColor(List<_PathItem> items, int lessonIndex) {
+    for (int i = lessonIndex - 1; i >= 0; i--) {
+      if (items[i].type == _PathItemType.section) {
+        return _sectionColor(items[i].title);
+      }
+    }
+    return accentOrange;
   }
 
   List<_PathItem> _buildItemsWithSections(
@@ -181,7 +213,7 @@ class _LearningPathPageState extends State<LearningPathPage> {
     );
   }
 
-  Widget _buildLessonTile({required String title, required _NodeStatus status}) {
+  Widget _buildLessonTile({required String title, required _NodeStatus status, required Color sectionColor}) {
     final bool isLocked = status == _NodeStatus.locked;
     final bool isCurrent = status == _NodeStatus.current;
     final Color edgeColor =
@@ -209,9 +241,24 @@ class _LearningPathPageState extends State<LearningPathPage> {
       margin: EdgeInsets.symmetric(vertical: 8),
       padding: EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.06),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            sectionColor.withOpacity(0.16),
+            Colors.transparent,
+          ],
+        ),
+        color: sectionColor.withOpacity(0.06),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.white12),
+        border: Border.all(color: sectionColor.withOpacity(0.3)),
+        boxShadow: [
+          BoxShadow(
+            color: sectionColor.withOpacity(0.18),
+            blurRadius: 14,
+            offset: Offset(0, 6),
+          ),
+        ],
       ),
       child: Row(
         children: [
@@ -327,9 +374,9 @@ class _SectionSpec {
 
 Color _sectionColor(String title) {
   // Match colors used in expense_page pie sections:
-  // Red: 0xFFE53935, Blue: 0xFF42A5F5, Amber: 0xFFFFA000, Orange: 0xFFFF8F00, LightBlue: 0xFF64B5F6
+  // Red (Foundations): 0xFFEC407A, Blue: 0xFF42A5F5, Amber: 0xFFFFA000, Orange: 0xFFFF8F00, LightBlue: 0xFF64B5F6
   final t = title.toLowerCase();
-  if (t.contains('foundation')) return const Color(0xFF42A5F5); // blue
+  if (t.contains('foundation')) return const Color(0xFFEC407A); // red like Leisure
   if (t.contains('money')) return const Color(0xFFFFA000); // amber
   if (t.contains('saving')) return const Color(0xFF64B5F6); // light blue
   if (t.contains('invest')) return const Color(0xFFE53935); // red

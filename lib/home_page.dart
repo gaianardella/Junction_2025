@@ -56,11 +56,11 @@ class _HomePageState extends State<HomePage> {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             IconButton(
-              icon: Icon(Icons.menu, color: Colors.white),
+              icon: Icon(Icons.sports_esports, color: Colors.white),
               onPressed: () => _onItemTapped(2),
             ),
             IconButton(
-              icon: Icon(Icons.confirmation_number, color: Colors.white),
+              icon: Icon(Icons.account_balance_wallet, color: Colors.white),
               onPressed: () => _onItemTapped(3),
             ),
             SizedBox(width: 50),
