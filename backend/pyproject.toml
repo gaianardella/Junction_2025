@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "junction-backend"
+version = "0.1.0"
+description = "FastAPI backend for Junction 2025 project (Gemini 2.5 Flash integration)."
+authors = ["vidre <you@example.com>"]
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.115.0"
+uvicorn = {extras = ["standard"], version = "^0.32.0"}
+google-genai = "^0.2.0"
+python-dotenv = "^1.0.1"
+python-multipart = "^0.0.9"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

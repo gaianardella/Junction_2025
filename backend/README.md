@@ -5,17 +5,15 @@ Non-PDF files are not supported yet (conversion TBD).
 
 ---
 
-## Setup
+## Setup (with Poetry)
 
 cd backend
-python3 -m venv .venv
-source .venv/bin/activate       # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
+poetry install
 cp .env.example .env            # add your GEMINI_API_KEY here
 
-## Run
+## Run (with Poetry)
 
-uvicorn main:app --reload --port 8000
+poetry run uvicorn main:app --reload --port 8000
 
 ## Endpoint
  POST /analyze
