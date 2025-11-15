@@ -1,3 +1,4 @@
+import json
 import os
 from pathlib import Path
 
@@ -5,6 +6,7 @@ from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from google import genai
 from google.genai import types
+from google.cloud import firestore
 from dotenv import load_dotenv
 
 # Load environment variables from .env (if present)
@@ -15,6 +17,9 @@ if not API_KEY:
     raise RuntimeError("GEMINI_API_KEY is not set in the environment. Set it as described in https://ai.google.dev/gemini-api/docs/api-key")
 
 client = genai.Client(api_key=API_KEY)
+
+FIRESTORE_PROJECT = os.getenv("GCP_PROJECT_ID", "junction2025-478315")
+firestore_client = firestore.Client(project=FIRESTORE_PROJECT)
 
 app = FastAPI()
 
@@ -31,6 +36,52 @@ app.add_middleware(
 @app.get("/")
 def health_check():
     return {"status": "ok"}
+
+
+def fetch_nano_lessons(limit: int = 10) -> list[dict]:
+    docs = (
+        firestore_client.collection("nano_lessons")
+        .limit(limit)
+        .stream()
+    )
+    lessons = []
+    for doc in docs:
+        data = doc.to_dict() or {}
+        data["id"] = doc.id
+        lessons.append(data)
+    return lessons
+
+
+def build_prompt_for_nano(user_profile: dict, lessons: list[dict]) -> str:
+    lesson_lines = []
+    for lesson in lessons:
+        tags = ", ".join(lesson.get("tags", []))
+        line = (
+            f"- ID: {lesson.get('id')} | Title: {lesson.get('title')}\n"
+            f"  Summary: {lesson.get('summary')}\n"
+            f"  Action hint: {lesson.get('action_hint')}\n"
+            f"  Tags: {tags}"
+        )
+        lesson_lines.append(line)
+
+    prompt = f"""
+You are a financial literacy coach choosing the best nano learning tip for one user.
+Select ONE lesson from the list and explain why it fits.
+
+User profile:
+{json.dumps(user_profile, indent=2)}
+
+Available nano lessons:
+{chr(10).join(lesson_lines)}
+
+Respond in JSON with fields:
+{{
+  "lesson_id": "...",
+  "title": "...",
+  "reason": "short explanation tailored to this user"
+}}
+"""
+    return prompt.strip()
 
 
 async def convert_to_pdf_stub(upload_file: UploadFile) -> bytes:
@@ -102,3 +153,44 @@ async def analyze(
         )
 
     return {"answer": response.text}
+
+
+@app.post("/recommend/nano")
+async def recommend_nano():
+    lessons = fetch_nano_lessons(limit=5)
+    if not lessons:
+        raise HTTPException(status_code=404, detail="No nano lessons found in Firestore.")
+
+    user_profile = {
+        "age_group": "18-24",
+        "life_stage": "first_apartment",
+        "goals": ["build_emergency_fund", "reduce_impulse_spending"],
+        "recent_behavior": {
+            "impulse_radar": "high",
+            "subscriptions": "growing",
+            "wants_vs_needs": "wants 35%",
+        },
+        "preferred_style": "bullets",
+    }
+
+    prompt = build_prompt_for_nano(user_profile, lessons)
+
+    try:
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=[prompt],
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error calling Gemini: {e}")
+
+    raw_text = response.text or ""
+    try:
+        recommendation = json.loads(raw_text)
+    except json.JSONDecodeError:
+        recommendation = {"raw_text": raw_text}
+
+    return {
+        "user_profile": user_profile,
+        "lessons_considered": [lesson["id"] for lesson in lessons],
+        "gemini_response": recommendation,
+    }

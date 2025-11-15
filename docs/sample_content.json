@@ -1,0 +1,54 @@
+{
+  "nano_lessons": [
+    {
+      "id": "nano_001",
+      "title": "Tap payments feel cheaper than they are",
+      "summary": "Small card taps add up fast.",
+      "content": "When you pay with card or mobile tap, you don’t feel the same friction as handing over cash. List your last five tap purchases and total them. Still feel small?",
+      "action_hint": "Set a soft weekly limit for taps under 15€.",
+      "tags": ["digital_payments", "awareness"],
+      "estimated_time_seconds": 40
+    },
+    {
+      "id": "nano_002",
+      "title": "Subscriptions = yearly cost",
+      "summary": "Monthly fees hide the true impact.",
+      "content": "Multiply each monthly subscription by 12 to see the yearly cost. Five 9.99€ subs is nearly 600€ per year.",
+      "action_hint": "Mark one subscription you will review this month.",
+      "tags": ["subscriptions", "budgeting"],
+      "estimated_time_seconds": 35
+    },
+    {
+      "id": "nano_003",
+      "title": "Impulse buys often happen late",
+      "summary": "Time of day matters.",
+      "content": "Our data shows many impulse buys happen after 9 PM when energy is low. Notice when you tend to shop and delay night purchases until morning review.",
+      "action_hint": "Enable a ‘pause after 9 PM’ reminder.",
+      "tags": ["impulse_control", "habits"],
+      "estimated_time_seconds": 45
+    },
+    {
+      "id": "nano_004",
+      "title": "Emergency fund = stress buffer",
+      "summary": "Even 300€ changes how you feel.",
+      "content": "A small emergency fund stops a surprise bill from becoming debt. Start with 300€—that covers most phone repairs and many medical co-pays.",
+      "action_hint": "Move 10€ today toward an emergency envelope.",
+      "tags": ["emergency_fund", "resilience"],
+      "estimated_time_seconds": 40
+    },
+    {
+      "id": "nano_005",
+      "title": "Big goals need names",
+      "summary": "Naming a goal increases follow-through.",
+      "content": "Write your next savings goal as a specific sentence: “I’m saving 500€ for moving costs.” Specific goals are easier to protect from impulse spending.",
+      "action_hint": "Rename your main goal in the app right now.",
+      "tags": ["goals", "motivation"],
+      "estimated_time_seconds": 30
+    }
+  ],
+  "articles": [],
+  "quests": [],
+  "actions": [],
+  "lessons": [],
+  "warnings": []
+}
