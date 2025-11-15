@@ -120,6 +120,8 @@ class _HomeContentState extends State<HomeContent> {
 
   bool _isLoadingInsights = false;
   String _insightText = '';
+  String _insightTitleClean = '';
+  String _insightReason = '';
 
   List<Map<String, dynamic>> get savingGoals => [
     {
@@ -159,6 +161,22 @@ class _HomeContentState extends State<HomeContent> {
         duration: Duration(milliseconds: 800),
         backgroundColor: accentOrange.withOpacity(0.8),
       ),
+    );
+  }
+
+  // Slide-in animation from right (like Learning Path)
+  Widget _slideInFromRight({required int index, required Widget child}) {
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0.0, end: 1.0),
+      duration: Duration(milliseconds: 400 + (index * 100)),
+      curve: Curves.easeInOut,
+      builder: (context, value, c) {
+        return Transform.translate(
+          offset: Offset(20 * (1 - value), 0),
+          child: Opacity(opacity: value, child: c),
+        );
+      },
+      child: child,
     );
   }
 
@@ -217,16 +235,10 @@ class _HomeContentState extends State<HomeContent> {
           // STEP 5 – Update UI
           setState(() {
             _insightText = newInsight;
+            _insightTitleClean = cleanTitle;
+            _insightReason = formattedReason;
             _isLoadingInsights = false;
           });
-
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text("Insights updated!"),
-              duration: Duration(milliseconds: 800),
-              backgroundColor: Colors.green.withOpacity(0.8),
-            ),
-          );
         } catch (e) {
           setState(() {
             _insightText = "Error parsing insight: $e";
@@ -305,54 +317,68 @@ class _HomeContentState extends State<HomeContent> {
         // Middle Content
         SliverList(
           delegate: SliverChildListDelegate([
-            Padding(
-              padding: EdgeInsets.fromLTRB(16, 20, 16, 16),
-              child: _buildBalanceSummaryCard(),
+            _slideInFromRight(
+              index: 0,
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(16, 20, 16, 16),
+                child: _buildBalanceSummaryCard(),
+              ),
             ),
-            Padding(
-              padding: EdgeInsets.fromLTRB(16, 4, 16, 16),
-              child: _buildSavingGoalsCard(),
+            _slideInFromRight(
+              index: 1,
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(16, 4, 16, 16),
+                child: _buildSavingGoalsCard(),
+              ),
             ),
-            Padding(
-              padding: EdgeInsets.fromLTRB(16, 4, 16, 16),
-              child: _buildContinueCard(),
+            _slideInFromRight(
+              index: 2,
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(16, 4, 16, 16),
+                child: _buildContinueCard(),
+              ),
             ),
-            Padding(
-              padding: EdgeInsets.fromLTRB(16, 8, 16, 16),
-              child: SizedBox(
-                height: 170,
-                child: Stack(
-                  children: [
-                    PageView(
-                      controller: _carouselController,
-                      onPageChanged: (i) => setState(() => _carouselIndex = i),
-                      children: [_buildTipCard(), _buildSuggestionCard()],
-                    ),
-                    Positioned(
-                      bottom: 8,
-                      left: 0,
-                      right: 0,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: List.generate(2, (i) {
-                          bool active = i == _carouselIndex;
-                          return AnimatedContainer(
-                            duration: Duration(milliseconds: 300),
-                            width: active ? 20 : 8,
-                            height: 8,
-                            margin: EdgeInsets.symmetric(horizontal: 3),
-                            decoration: BoxDecoration(
-                              color:
-                                  active
-                                      ? accentOrange
-                                      : Colors.white.withOpacity(0.4),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          );
-                        }),
+            _slideInFromRight(
+              index: 3,
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(16, 8, 16, 16),
+                child: SizedBox(
+                  height: _isLoadingInsights
+                      ? 200
+                      : (_insightText.isNotEmpty ? 280 : 170),
+                  child: Stack(
+                    children: [
+                      PageView(
+                        controller: _carouselController,
+                        onPageChanged: (i) =>
+                            setState(() => _carouselIndex = i),
+                        children: [_buildTipCard(), _buildSuggestionCard()],
                       ),
-                    ),
-                  ],
+                      Positioned(
+                        bottom: 8,
+                        left: 0,
+                        right: 0,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: List.generate(2, (i) {
+                            bool active = i == _carouselIndex;
+                            return AnimatedContainer(
+                              duration: Duration(milliseconds: 300),
+                              width: active ? 20 : 8,
+                              height: 8,
+                              margin: EdgeInsets.symmetric(horizontal: 3),
+                              decoration: BoxDecoration(
+                                color: active
+                                    ? accentOrange
+                                    : Colors.white.withOpacity(0.4),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            );
+                          }),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -661,7 +687,7 @@ class _HomeContentState extends State<HomeContent> {
               ),
               SizedBox(width: 10),
               Text(
-                'Actionable Insight',
+                'Recommended Insight',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 18,
@@ -670,33 +696,40 @@ class _HomeContentState extends State<HomeContent> {
               ),
             ],
           ),
-          SizedBox(height: 12),
-
-          _isLoadingInsights
-              ? Center(
-                child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(accentOrange),
-                ),
-              )
-              : Text(
-                _insightText,
-                style: TextStyle(color: Colors.white70, fontSize: 13),
-              ),
-
-          SizedBox(height: 12),
+          SizedBox(height: 8),
+          Flexible(
+            child: _isLoadingInsights
+                ? Center(
+                    child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(accentOrange),
+                    ),
+                  )
+                : (_insightText.isNotEmpty || _insightTitleClean.isNotEmpty
+                    ? SingleChildScrollView(
+                        padding: EdgeInsets.only(right: 6),
+                        child: RichText(
+                          text: TextSpan(
+                            style: TextStyle(color: Colors.white70, fontSize: 13, height: 1.3),
+                            children: [
+                              TextSpan(text: 'We recommend '),
+                              TextSpan(
+                                text: _insightTitleClean.isNotEmpty ? _insightTitleClean : 'this',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              TextSpan(text: ' because ${_insightReason.isNotEmpty ? _insightReason : ''}'),
+                            ],
+                          ),
+                        ),
+                      )
+                    : SizedBox.shrink()),
+          ),
+          SizedBox(height: 8),
           ElevatedButton.icon(
             onPressed: _isLoadingInsights ? null : _fetchInsights,
-            icon:
-                _isLoadingInsights
-                    ? SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                      ),
-                    )
-                    : Icon(Icons.cloud_download, size: 20),
+            icon: Icon(Icons.cloud_download, size: 20),
             label: Text(_isLoadingInsights ? "Loading..." : "Get Insights"),
             style: ElevatedButton.styleFrom(
               backgroundColor: accentOrange,
