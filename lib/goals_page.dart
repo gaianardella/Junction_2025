@@ -45,22 +45,6 @@ class SavingsGoal {
       (currentAmount / targetAmount * 100).clamp(0, 100);
 }
 
-class AccomplishedGoal {
-  final String title;
-  final String region;
-  final double amount;
-  final String imagePath;
-  final String emoji;
-
-  AccomplishedGoal({
-    required this.title,
-    required this.region,
-    required this.amount,
-    required this.imagePath,
-    required this.emoji,
-  });
-}
-
 // --- Goals Page ---
 class GoalsPage extends StatefulWidget {
   @override
@@ -86,30 +70,6 @@ class _GoalsPageState extends State<GoalsPage> with TickerProviderStateMixin {
       interestRate: 3.0,
       emojiLevel: '✈️',
       customColor: Color(0xFF0288D1),
-    ),
-  ];
-
-  final List<AccomplishedGoal> accomplishedGoals = [
-    AccomplishedGoal(
-      title: 'First Car',
-      region: 'Helsinki',
-      amount: 4000.0,
-      imagePath: 'assets/car.jpg',
-      emoji: '🚗',
-    ),
-    AccomplishedGoal(
-      title: 'Apartment',
-      region: 'Tampere',
-      amount: 1500.0,
-      imagePath: 'assets/apartment.jpg',
-      emoji: '🏠',
-    ),
-    AccomplishedGoal(
-      title: 'Festival',
-      region: 'Oulu',
-      amount: 500.0,
-      imagePath: 'assets/festival.jpg',
-      emoji: '🎪',
     ),
   ];
 
@@ -210,12 +170,6 @@ class _GoalsPageState extends State<GoalsPage> with TickerProviderStateMixin {
 
                 // Main Goal Carousel
                 _buildCurrentGoalSection(context),
-
-                SizedBox(height: 32),
-
-                // AI Showcase
-                _buildAIGoalShowcase(),
-                
 
                 SizedBox(height: 100),
               ],
@@ -519,8 +473,6 @@ class _GoalsPageState extends State<GoalsPage> with TickerProviderStateMixin {
                         ),
 
                         SizedBox(height: 12),
-
-                        // Interest rate removed
                       ],
                     ),
                   ),
@@ -630,187 +582,6 @@ class _GoalsPageState extends State<GoalsPage> with TickerProviderStateMixin {
       ),
     );
   }
-
-  Widget _buildAIGoalShowcase() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    padding: EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [purpleAccent, purpleAccent.withOpacity(0.7)],
-                      ),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Icon(
-                      Icons.auto_awesome,
-                      color: Colors.white,
-                      size: 20,
-                    ),
-                  ),
-                  SizedBox(width: 12),
-                  Flexible(
-                    child: Text(
-                      'Peer Inspiration',
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 6),
-              Text(
-                'Real goals achieved by people like you',
-                style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-              ),
-            ],
-          ),
-        ),
-        SizedBox(height: 16),
-        SizedBox(
-          height: 200,
-          child: ListView.builder(
-            padding: EdgeInsets.symmetric(horizontal: 16),
-            scrollDirection: Axis.horizontal,
-            itemCount: accomplishedGoals.length,
-            itemBuilder:
-                (context, index) =>
-                    _buildAccomplishedGoalCard(accomplishedGoals[index]),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildAccomplishedGoalCard(AccomplishedGoal goal) {
-    final Color baseColor = _colorForAccomplishedGoal(goal);
-    return Container(
-      width: 160,
-      margin: EdgeInsets.only(right: 12),
-      child: Material(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        elevation: 4,
-        shadowColor: baseColor.withOpacity(0.2),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(20),
-          onTap: () => print('Start Goal: ${goal.title}'),
-          child: Stack(
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Expanded(
-                    flex: 3,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            baseColor,
-                            baseColor.withOpacity(0.7),
-                          ],
-                        ),
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(20),
-                          topRight: Radius.circular(20),
-                        ),
-                      ),
-                      child: Center(
-                        child: Text(goal.emoji, style: TextStyle(fontSize: 48)),
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    flex: 2,
-                    child: Padding(
-                      padding: EdgeInsets.all(12),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            goal.title,
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black87,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          Spacer(),
-                          
-                          Text(
-                            '€${goal.amount.toStringAsFixed(0)}',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: successGreen,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              Positioned(
-                top: 8,
-                right: 8,
-                child: Container(
-                  padding: EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    Icons.check_circle,
-                    color: successGreen,
-                    size: 16,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Color _colorForAccomplishedGoal(AccomplishedGoal goal) {
-    final String title = goal.title.toLowerCase();
-    if (title.contains('car')) {
-      // Yellow (amber) for Car
-      return Color(0xFFFFC107);
-    }
-    if (title.contains('festival')) {
-      // Green for Festival
-      return successGreen;
-    }
-    // Deterministic pick from palette for others
-    final List<Color> palette = [
-      accentOrange,
-      primaryBlue,
-      purpleAccent,
-      successGreen,
-    ];
-    final int index = goal.title.codeUnits.fold(0, (a, b) => a + b) % palette.length;
-    return palette[index];
-  }
-
-  // Removed "Next in Line" section and related helpers
 
   Widget _buildEmptyState() {
     return Container(

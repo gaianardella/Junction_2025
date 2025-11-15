@@ -709,14 +709,22 @@ class _HomeContentState extends State<HomeContent> {
           Align(
             alignment: Alignment.centerLeft,
             child: ElevatedButton.icon(
-              onPressed: () => widget.onGoToLearning?.call(),
-              icon: Icon(Icons.arrow_right_alt, size: 20),
-              label: Text("Go to Learning Path"),
+              onPressed: () {
+                // TODO: Integrate with backend system to fetch personalized insights
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text("Fetching insights from backend..."),
+                    duration: Duration(milliseconds: 1000),
+                    backgroundColor: accentOrange.withOpacity(0.8),
+                  ),
+                );
+              },
+              icon: Icon(Icons.cloud_download, size: 20),
+              label: Text("Get Insights"),
               style: ElevatedButton.styleFrom(
-                backgroundColor:
-                    primaryBlue, // Use primaryBlue for an alternative CTA color
+                backgroundColor: accentOrange,
                 foregroundColor: Colors.white,
-                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
