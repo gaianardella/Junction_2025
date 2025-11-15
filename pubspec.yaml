@@ -48,7 +48,7 @@ dev_dependencies:
 flutter_icons:
   android: true
   ios: true
-  image_path: "assets/app_logo.png" # Sostituisci con il percorso della tua icona
+  image_path: "assets/app_logo.jpg" # Sostituisci con il percorso della tua icona
   adaptive_icon_background: "#ffffff" # Sfondo per le icone adattive su Android
 
 # For information on the generic Dart part of this file, see the
@@ -57,39 +57,8 @@ flutter_icons:
 # The following section is specific to Flutter packages.
 flutter:
   assets:
-    - assets/logo.png
+    - assets/logo.jpg
     - assets/avatar_profile.png
-    - assets/badge_1.png
-    - assets/badge_1_taken.png
-    - assets/badge_2.png
-    - assets/badge_2_taken.png
-    - assets/badge_3.png
-    - assets/badge_3_taken.png
-    - assets/badge_4.png
-    - assets/badge_4_taken.png
-    - assets/badge_5.png
-    - assets/badge_5_taken.png
-    - assets/badge_6.png
-    - assets/badge_6_taken.png
-    - assets/virgin_atlantic_logo.png
-    - assets/virgin_active_logo.png
-    - assets/virgin_hotels_logo.png
-    - assets/virgin_radio_logo.png
-    - assets/mangrove.jpg
-    - assets/mostro1.png
-    - assets/mostro2.png
-    - assets/mostro3.png
-    - assets/mostro4.png
-    - assets/mostro2_profilo.png
-    - assets/mostro3_profilo.png
-    - assets/mostro4_profilo.png
-    - assets/gift.jpg
-    - assets/whale.jpg
-    - assets/community.jpg
-    - assets/airplane.jpeg
-    - assets/radio.jpg
-    - assets/hotel.jpg
-    - assets/VI_avatar.mov
     - assets/img_samir.png
     - assets/gaia.png
     - assets/Dimitrii.jpg

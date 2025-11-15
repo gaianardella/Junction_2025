@@ -215,17 +215,12 @@ class _ExpenseTrackerContentState extends State<ExpenseTrackerContent>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Hello, $userName',
+                          'Spending Breakdown',
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 20,
+                            fontSize: 24,
                             fontWeight: FontWeight.w700,
                           ),
-                        ),
-                        SizedBox(height: 4),
-                        Text(
-                          'Overview',
-                          style: TextStyle(color: Colors.white70, fontSize: 13),
                         ),
                       ],
                     ),
@@ -242,39 +237,27 @@ class _ExpenseTrackerContentState extends State<ExpenseTrackerContent>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      children: [
-                        Icon(Icons.pie_chart, color: primaryBlue, size: 22),
-                        SizedBox(width: 8),
-                        Text(
-                          'Spending Breakdown',
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w700,
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: ElevatedButton.icon(
+                        onPressed: _openAddExpense,
+                        icon: Icon(Icons.add, size: 16),
+                        label: Text('Add'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: accentOrange,
+                          foregroundColor: Colors.white,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 6,
                           ),
-                        ),
-                        Spacer(),
-                        ElevatedButton.icon(
-                          onPressed: _openAddExpense,
-                          icon: Icon(Icons.add, size: 16),
-                          label: Text('Add'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: accentOrange,
-                            foregroundColor: Colors.white,
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 6,
-                            ),
-                            minimumSize: Size(0, 0),
-                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            elevation: 0,
+                          minimumSize: Size(0, 0),
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
                           ),
+                          elevation: 0,
                         ),
-                      ],
+                      ),
                     ),
                     SizedBox(height: 40),
                     _buildAnimatedChartWithBalance(),

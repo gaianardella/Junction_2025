@@ -5,6 +5,7 @@ import 'expense_page.dart';
 import 'goals_page.dart';
 import 'badges_page.dart';
 import 'learning_path_page.dart';
+import 'spending_sandbox_page.dart';
 import 'budget_course_page.dart';
 import 'dart:math'; // For random data in interactive widgets
 
@@ -45,7 +46,7 @@ class _HomePageState extends State<HomePage> {
         onGoToLearning: () => _onItemTapped(1),
       ), // Separate class for home content
       LearningPathPage(), // Index 1
-      ActivityPage(), // Index 2
+      SpendingSandboxPage(), // Index 2
       ExpensePage(), // Index 3
       BadgesPage(), // Index 4
       GoalsPage(), // Index 5 (Not directly in NavBar, but linkable)

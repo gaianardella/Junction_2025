@@ -105,32 +105,41 @@ class _BadgesPageState extends State<BadgesPage>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: backgroundBlue,
-      appBar: AppBar(
-        title: Text('Scoreboard', style: TextStyle(color: Colors.white)),
-        backgroundColor: accent,
-        elevation: 0,
-        actions: [
-          Padding(padding: EdgeInsets.only(right: 16), child: AvatarWidget()),
-        ],
-      ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.fromLTRB(16, 16, 16, 24),
-        child: FadeTransition(
-          opacity: _fadeAnimation,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // Monthly challenge banner with pulse animation
-              _buildChallengeBanner(),
-              SizedBox(height: 24),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: EdgeInsets.fromLTRB(16, 16, 16, 24),
+          child: FadeTransition(
+            opacity: _fadeAnimation,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Header spacing (banner removed)
+                Padding(
+                  padding: EdgeInsets.only(bottom: 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Scoreboard',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 24,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      AvatarWidget(size: 44),
+                    ],
+                  ),
+                ),
 
-              // Stats overview
-              _buildStatsOverview(),
-              SizedBox(height: 20),
+                // Stats overview
+                _buildStatsOverview(),
+                SizedBox(height: 20),
 
-              // Scoreboard
-              _buildLeaderboard(),
-            ],
+                // Scoreboard
+                _buildLeaderboard(),
+              ],
+            ),
           ),
         ),
       ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'budget_course_page.dart';
+import 'widgets/avatar_widget.dart';
 
 class LearningPathPage extends StatefulWidget {
   @override
@@ -62,36 +63,9 @@ class _LearningPathPageState extends State<LearningPathPage> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      SizedBox(height: 4),
-                      Text(
-                        'Financial Literacy',
-                        style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: 14,
-                        ),
-                      ),
                     ],
                   ),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(Icons.star, color: accentOrange, size: 18),
-                        SizedBox(width: 6),
-                        Text(
-                          'XP 1240',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                  AvatarWidget(size: 44),
                 ],
               ),
             ),
